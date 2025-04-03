@@ -1,8 +1,9 @@
-import { Skin } from "./skin";
+import { InventoryItem } from "./inventory";
 
 export type Tradeup = {
   id: string;
   rarity: string;
   locked: boolean;
-  skins: Map<string, Skin>; // invId => skin
+  items: InventoryItem[];
+  status: string;
 }

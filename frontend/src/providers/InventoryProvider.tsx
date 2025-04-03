@@ -22,7 +22,6 @@ export function InventoryProvider({ children, userId }: InventoryProviderProps) 
     async function fetchInventory() {
       const res = await fetch(`/v1/inventory?userId=${userId}`)
       const data: Inventory = await res.json()
-      console.log(data)
       setInventory(data)
     }
     if (userId) {

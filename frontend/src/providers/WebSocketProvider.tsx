@@ -4,7 +4,7 @@ import { Tradeup } from "../types/tradeup";
 
 interface WebSocketContextType {
   tradeups: Tradeup[];
-  currentTradeup: Tradeup | any;
+  currentTradeup: Tradeup | null;
   subscribeToAll: () => void;
   subscribeToTradeup: (tradeupId: string) => void;
   unsubscribe: () => void;

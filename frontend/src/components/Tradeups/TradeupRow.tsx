@@ -1,33 +1,37 @@
 import { useNavigate } from "react-router";
+import { InventoryItem } from "../../types/inventory"
+import ImageCarousel from "../ImageCarousel";
 import { Skin } from "../../types/skin";
 
 interface TradeupRowProps {
   id: string;
   players: any[];
   rarity: string;
-  skins: Map<string, Skin>;
+  items: InventoryItem[];
   status: string;
 }
 
-export default function TradeupRow({ id, players, rarity, skins, status }: TradeupRowProps) {
+export default function TradeupRow({ id, players, rarity, items, status }: TradeupRowProps) {
   const dividerColor: string = ""
   const totalPrice: number = 0
+
+  const skins: Skin[] = items.filter(item =>
+    item.data && typeof item.data === 'object' && 'id' in item.data &&
+    'name' in item.data && 'rarity' in item.data).map(item => item.data as Skin)
 
   return (
     <div className="join bg-base-300 border-6 border-base-200 items-center justify-evenly lg:w-3/4 rounded-md">
       <div className="join-item">
         <InfoPanel 
           rarity={rarity} 
-          count={skins.size} 
+          count={items.length} 
         />
       </div>
       <div className={`divider divider-horizontal ${dividerColor}`}></div>
 
-      {/*
       <div className="join-item">
-        <ItemCarousel skins={skins} />
+        <ImageCarousel skins={skins} />
       </div>
-      */}
       <div className="divider divider-horizontal divider-info"></div>
 
       <div className="flex items-start">

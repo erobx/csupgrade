@@ -21,7 +21,7 @@ export default function InventoryPage() {
                   <button className="btn btn-soft" onClick={() => removeItem(item.invId)}>Delete</button>
                 </div>
               ) : (
-                <p>No skin data available</p>
+                <div className="loading-spinner loading-xl"></div>
               )}
             </div>
           ))}

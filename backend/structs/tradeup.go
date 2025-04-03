@@ -1,8 +1,9 @@
 package structs
 
 type Tradeup struct {
-    Id      string          `json:"id"`
-    Rarity  string          `json:"rarity"`
-    Skins   map[string]string `json:"skins"`
-    Locked  bool            `json:"locked"`
+    Id      int     `json:"id"`
+    Rarity  string  `json:"rarity"`
+    Items   []Item  `json:"items"`
+    Locked  bool    `json:"locked"`
+    Status  string  `json:"status"`
 }

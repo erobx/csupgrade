@@ -12,6 +12,36 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
+var (
+    s1 = structs.Skin{
+        Id: 1,
+        Name: "AWP | Dragon Lore",
+        Rarity: "Covert",
+        Collection: "The Anal Collection",
+        Wear: "Factory New",
+        Float: 0.0521,
+        Price: 1321.42,
+        IsStatTrak: true,
+        WasWon: false,
+        ImgSrc: "",
+        CreatedAt: time.Now(),
+    }
+
+    s2 = structs.Skin{
+        Id: 2,
+        Name: "AUG | Wings",
+        Rarity: "Industrial",
+        Collection: "The Booty Collection",
+        Wear: "Battle-Scarred",
+        Float: 0.9213,
+        Price: 0.10,
+        IsStatTrak: false,
+        WasWon: false,
+        ImgSrc: "",
+        CreatedAt: time.Now(),
+    }
+)
+
 type Server struct {
     sync.Mutex
     addr        string
@@ -29,18 +59,36 @@ func NewServer(addr string) *Server {
     }
 
     t1 := &structs.Tradeup{
-        Id: "1",
+        Id: 1,
         Rarity: "Consumer",
-        Skins: make(map[string]string),
+        Items: make([]structs.Item, 0),
         Locked: false,
+        Status: "Active",
     }
     
     t2 := &structs.Tradeup{
-        Id: "2",
+        Id: 2,
         Rarity: "Consumer",
-        Skins: make(map[string]string),
+        Items: make([]structs.Item, 0),
         Locked: false,
+        Status: "Active",
     }
+
+    item1 := structs.Item{
+        InvId: 1,
+        Data: s1,
+        Visible: true,
+    }
+
+    item2 := structs.Item{
+        InvId: 5,
+        Data: s2,
+        Visible: true,
+    }
+
+    t1.Items = append(t1.Items, item1)
+    t1.Items = append(t1.Items, item2)
+    t2.Items = append(t2.Items, item2)
 
     s.tradeups["1"] = t1
     s.tradeups["2"] = t2
@@ -100,33 +148,7 @@ func (s *Server) getInventory() fiber.Handler {
         userId := c.Query("userId")
         log.Printf("Requesting inventory for %s\n", userId)
 
-        s1 := structs.Skin{
-            Id: 1,
-            Name: "AWP | Dragon Lore",
-            Rarity: "Covert",
-            Collection: "The Anal Collection",
-            Wear: "Factory New",
-            Float: 0.0521,
-            Price: 1321.42,
-            IsStatTrak: true,
-            WasWon: false,
-            ImgSrc: "",
-            CreatedAt: time.Now(),
-        }
-
-        s2 := structs.Skin{
-            Id: 2,
-            Name: "AUG | Wings",
-            Rarity: "Industrial",
-            Collection: "The Booty Collection",
-            Wear: "Battle-Scarred",
-            Float: 0.9213,
-            Price: 0.10,
-            IsStatTrak: false,
-            WasWon: false,
-            ImgSrc: "",
-            CreatedAt: time.Now(),
-        }
+        
 
         items := []structs.Item{
             {
@@ -214,7 +236,12 @@ func (s *Server) handleSubscription(userId string, msg []byte) {
     case "subscribe_all":
         client.SubscribedAll = true
         client.SubscribedId = ""
-        client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": s.tradeups})
+        temp := []structs.Tradeup{}
+        for _, t := range s.tradeups {
+            temp = append(temp, *t)
+        }
+        log.Println("Sending tradeups:", temp)
+        client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": temp})
     case "subscribe_one":
         client.SubscribedAll = false
         client.SubscribedId = payload.TradeupId
@@ -229,22 +256,22 @@ func (s *Server) handleSubscription(userId string, msg []byte) {
     }
 }
 
-func (s *Server) addSkin(userId, tradeupId, skinId string) {
-    s.Lock()
-
-    log.Println("Adding skin...")
-    t, exists := s.tradeups[tradeupId]
-    if !exists {
-        t = &structs.Tradeup{Id: tradeupId, Skins: make(map[string]string)}
-        s.tradeups[tradeupId] = t
-    }
-
-    t.Skins[userId] = skinId
-
-    s.Unlock()
-
-    s.broadcastState()
-}
+//func (s *Server) addSkin(userId, tradeupId, skinId string) {
+//    s.Lock()
+//
+//    log.Println("Adding skin...")
+//    t, exists := s.tradeups[tradeupId]
+//    if !exists {
+//        t = &structs.Tradeup{Id: tradeupId, Skins: make(map[string]string)}
+//        s.tradeups[tradeupId] = t
+//    }
+//
+//    t.Skins[userId] = skinId
+//
+//    s.Unlock()
+//
+//    s.broadcastState()
+//}
 
 func (s *Server) broadcastState() {
     s.Lock()

@@ -4,7 +4,7 @@ import { Tradeup } from "../types/tradeup";
 
 export function useWebSocket(userId: string) {
   const [tradeups, setTradeups] = useState<Tradeup[]>([])
-  const [currentTradeup, setCurrentTradeup] = useState<Tradeup>()
+  const [currentTradeup, setCurrentTradeup] = useState<Tradeup | null>(null)
   //const { addItem } = useInventory()
   const ws = useRef<WebSocket>(null)
 

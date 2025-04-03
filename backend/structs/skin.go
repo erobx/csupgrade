@@ -2,12 +2,6 @@ package structs
 
 import "time"
 
-type Item struct {
-    InvId   int     `json:"invId"`
-    Data    any     `json:"data"`
-    Visible bool    `json:"visible"`
-}
-
 type Skin struct {
     Id          int         `json:"id"`
     Name        string      `json:"name"` // AWP | Dragon Lore

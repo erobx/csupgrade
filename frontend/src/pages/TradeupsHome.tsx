@@ -27,7 +27,7 @@ function TradeupsHome() {
             id={t.id}
             players={players}
             rarity={t.rarity}
-            skins={t.skins}
+            items={t.items}
             status={"Active"}
           />
         )
