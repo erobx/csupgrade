@@ -1,12 +1,8 @@
-export interface Skin {
-  id: string;
-  name: string;
-  rarity: string;
-}
+import { Skin } from "./skin";
 
-export interface Tradeup {
+export type Tradeup = {
   id: string;
   rarity: string;
   locked: boolean;
-  skins: Record<string, Skin>; // skinId => skin
+  skins: Map<string, Skin>; // invId => skin
 }

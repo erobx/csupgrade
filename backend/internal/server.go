@@ -105,8 +105,8 @@ func (s *Server) getInventory() fiber.Handler {
             Name: "AWP | Dragon Lore",
             Rarity: "Covert",
             Collection: "The Anal Collection",
-            WearName: "Factory New",
-            WearNum: 0.0521,
+            Wear: "Factory New",
+            Float: 0.0521,
             Price: 1321.42,
             IsStatTrak: true,
             WasWon: false,
@@ -119,8 +119,8 @@ func (s *Server) getInventory() fiber.Handler {
             Name: "AUG | Wings",
             Rarity: "Industrial",
             Collection: "The Booty Collection",
-            WearName: "Battle-Scarred",
-            WearNum: 0.9213,
+            Wear: "Battle-Scarred",
+            Float: 0.9213,
             Price: 0.10,
             IsStatTrak: false,
             WasWon: false,
@@ -128,14 +128,14 @@ func (s *Server) getInventory() fiber.Handler {
             CreatedAt: time.Now(),
         }
 
-        items := []structs.SkinItem{
+        items := []structs.Item{
             {
                 InvId: 1,
-                Skin: s1,
+                Data: s1,
                 Visible: true,
             },{
                 InvId: 2,
-                Skin: s2,
+                Data: s2,
                 Visible: true,
             },
         }

@@ -1,9 +1,12 @@
 import { useEffect } from "react"
 import { useWS } from "../providers/WebSocketProvider"
 import { Tradeup } from "../types/tradeup"
+import TradeupRow from "../components/Tradeups/TradeupRow"
 
 function TradeupsHome() {
   const { tradeups, subscribeToAll, unsubscribe } = useWS()
+
+  const players: any[] = []
 
   useEffect(() => {
     subscribeToAll()
@@ -14,10 +17,20 @@ function TradeupsHome() {
   }, [])
 
   return (
-    <div className="flex flex-col items-center mt-5">
-      <h1 className="font-bold text-3xl">Active Tradeups</h1>
+    <div className="flex flex-col items-center gap-2 mt-3">
+      <h1 className="text-warning font-bold text-3xl">Active Tradeups</h1>
+      {/* Status Filter Dropwdown */}
+
       {tradeups.length > 0 ? (
-        tradeups.map((t: Tradeup) => <p key={t.id}>{t.rarity}</p>)
+        tradeups.map((t: Tradeup) =>
+          <TradeupRow
+            id={t.id}
+            players={players}
+            rarity={t.rarity}
+            skins={t.skins}
+            status={"Active"}
+          />
+        )
       ) : (
         <p>No tradeups available.</p>
       )}

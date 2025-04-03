@@ -13,11 +13,11 @@ export default function InventoryPage() {
           .filter((item) => item.visible) // Hide tradeup skins
           .map((item) => (
             <div key={item.invId} className="card bg-base-300">
-              {item.skin ? (
+              {item.data? (
                 <div className="card-body">
-                  <h3>{item.skin.name}</h3>
-                  <p>Wear: {item.skin.wearName}</p>
-                  <p>Price: ${item.skin.price.toFixed(2)}</p>
+                  <h3>{item.data.name}</h3>
+                  <p>Wear: {item.data.wear}</p>
+                  <p>Price: ${item.data.price.toFixed(2)}</p>
                   <button className="btn btn-soft" onClick={() => removeItem(item.invId)}>Delete</button>
                 </div>
               ) : (
