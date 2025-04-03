@@ -1,0 +1,36 @@
+import { createContext, ReactNode, useContext } from "react";
+import { useWebSocket } from "../hooks/websocket";
+import { Tradeup } from "../types/tradeup";
+
+interface WebSocketContextType {
+  tradeups: Tradeup[];
+  currentTradeup: Tradeup | any;
+  subscribeToAll: () => void;
+  subscribeToTradeup: (tradeupId: string) => void;
+  unsubscribe: () => void;
+  sendLogin: (userId: string) => void;
+}
+
+const WebSocketContext = createContext<WebSocketContextType | null>(null)
+
+interface WebSocketProviderProps {
+  children: ReactNode;
+  userId: string;
+}
+
+export function WebSocketProvider({ children, userId }: WebSocketProviderProps) {
+  const ws = useWebSocket(userId)
+  return (
+    <WebSocketContext.Provider value={ws}>
+      {children}
+    </WebSocketContext.Provider>
+  )
+}
+
+export function useWS() {
+  const context = useContext(WebSocketContext)
+  if (!context) {
+    throw new Error("useWS must be used within a WebSocketProvider")
+  }
+  return context
+}

@@ -1,0 +1,83 @@
+import { useState, useEffect, useRef } from "react";
+import { Tradeup } from "../types/tradeup";
+//import { useInventory } from "../providers/InventoryProvider";
+
+export function useWebSocket(userId: string) {
+  const [tradeups, setTradeups] = useState<Tradeup[]>([])
+  const [currentTradeup, setCurrentTradeup] = useState<Tradeup>()
+  //const { addItem } = useInventory()
+  const ws = useRef<WebSocket>(null)
+
+  useEffect(() => {
+    function connectWebSocket() {
+      // If user is logged in, send their userId; o/w connect as anon
+      const socketUrl = userId
+        ? `ws://localhost:8080/ws?userId=${userId}`
+        : `ws://localhost:8080/ws`
+
+      ws.current = new WebSocket(socketUrl)
+
+      ws.current.onopen = () => {
+        console.log("WebSocket connected")
+        //subscribeToAll() // default to all tradeups
+      }
+
+      ws.current.onmessage = (event: any) => {
+        const data = JSON.parse(event.data)
+        console.log(data)
+
+        if (data.event === "sync_state") {
+          const tradeupArray: Tradeup[] = Object.values(data.tradeups)
+          setTradeups(tradeupArray)
+        } else if (data.event === "sync_tradeup") {
+          setCurrentTradeup(data.tradeup)
+        } else if (data.event === "tradeup_winner") {
+          if (data.userId === userId) {
+            //addItem({ ...data.winningItem, visible: true })
+          }
+        } else if (data.event === "new_item") {
+          //addItem({ ...data.item, visible: true })
+        }
+      }
+
+      ws.current.onclose = () => {
+        console.log("WebSocket disconnected, reconnecting...")
+        setTimeout(connectWebSocket, 2000) // Auto-reconnect
+      }
+    }
+    
+    connectWebSocket()
+
+    return () => {
+      if (ws.current) {
+        ws.current.close()
+      }
+    }
+  }, [userId]) // Reconnect only if userId changes (user logs in)
+
+  function subscribeToAll() {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ event: "subscribe_all" }))
+    }
+  }
+
+  function subscribeToTradeup(tradeupId: string) {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ event: "subscribe_one", tradeupId: tradeupId }))
+    }
+  }
+
+  function unsubscribe() {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ event: "unsubscribe"}))
+    }
+  }
+
+  function sendLogin(userId: string) {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ event: "login", userId }))
+    }
+  }
+
+  return { tradeups, currentTradeup, subscribeToAll, subscribeToTradeup, unsubscribe, sendLogin }
+}
