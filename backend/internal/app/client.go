@@ -3,7 +3,7 @@ package app
 import (
 	"time"
 
-	"github.com/erobx/tradeups-backend/structs"
+	"github.com/erobx/tradeups-backend/pkg/api"
 	"github.com/gofiber/contrib/websocket"
 )
 
@@ -25,9 +25,9 @@ var (
 
 type Client struct {
     Conn    *websocket.Conn
-    UserId  string // Empty if anon
-    SessionId string // Unique id for anon users
+    UserID  string // Empty if anon
+    SessionID string // Unique id for anon users
     SubscribedAll bool
-    SubscribedId string
-    Inventory structs.Inventory
+    SubscribedID string
+    Inventory api.Inventory
 }

@@ -25,6 +25,7 @@ export function InventoryProvider({ children, userId }: InventoryProviderProps) 
       setInventory(data)
     }
     if (userId) {
+      console.log("Fetching inventory...")
       fetchInventory()
     }
   }, [userId])

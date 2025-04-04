@@ -1,20 +1,19 @@
 package app
 
 import (
+	"crypto/rsa"
 	"encoding/json"
 	"log"
 	"sync"
 	"time"
 
-	"github.com/erobx/tradeups-backend/structs"
-	"github.com/gofiber/contrib/websocket"
+	"github.com/erobx/tradeups-backend/pkg/api"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 var (
-    s1 = structs.Skin{
-        Id: 1,
+    s1 = api.Skin{
+        ID: 1,
         Name: "AWP | Dragon Lore",
         Rarity: "Covert",
         Collection: "The Anal Collection",
@@ -27,8 +26,8 @@ var (
         CreatedAt: time.Now(),
     }
 
-    s2 = structs.Skin{
-        Id: 2,
+    s2 = api.Skin{
+        ID: 2,
         Name: "AUG | Wings",
         Rarity: "Industrial",
         Collection: "The Booty Collection",
@@ -46,42 +45,46 @@ type Server struct {
     sync.Mutex
     addr        string
     app         *fiber.App
+	privateKey *rsa.PrivateKey
+	userService api.UserService
     clients     map[string]*Client
-    tradeups    map[string]*structs.Tradeup // REPLACE WITH DB
+    tradeups    map[string]*api.Tradeup // REPLACE WITH DB
 }
 
-func NewServer(addr string) *Server {
+func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService) *Server {
     s := &Server{
         addr: addr,
         app: fiber.New(),
+		privateKey: privKey,
+		userService: us,
         clients: make(map[string]*Client),
-        tradeups: map[string]*structs.Tradeup{},
+        tradeups: map[string]*api.Tradeup{},
     }
 
-    t1 := &structs.Tradeup{
-        Id: 1,
+    t1 := &api.Tradeup{
+        ID: 1,
         Rarity: "Consumer",
-        Items: make([]structs.Item, 0),
+        Items: make([]api.Item, 0),
         Locked: false,
         Status: "Active",
     }
     
-    t2 := &structs.Tradeup{
-        Id: 2,
+    t2 := &api.Tradeup{
+        ID: 2,
         Rarity: "Consumer",
-        Items: make([]structs.Item, 0),
+        Items: make([]api.Item, 0),
         Locked: false,
         Status: "Active",
     }
 
-    item1 := structs.Item{
-        InvId: 1,
+    item1 := api.Item{
+        InvID: 1,
         Data: s1,
         Visible: true,
     }
 
-    item2 := structs.Item{
-        InvId: 5,
+    item2 := api.Item{
+        InvID: 5,
         Data: s2,
         Visible: true,
     }
@@ -93,8 +96,11 @@ func NewServer(addr string) *Server {
     s.tradeups["1"] = t1
     s.tradeups["2"] = t2
 
-    s.useMiddleware()
+    s.UseMiddleware()
     s.Routes()
+
+	s.Protect()
+	s.ProtectedRoutes()
 
     return s
 }
@@ -110,34 +116,12 @@ func (s *Server) Run() {
     log.Fatal(s.app.Listen(":"+s.addr))
 }
 
-func (s *Server) useMiddleware() {
-    s.app.Use(cors.New(cors.Config{
-        AllowOrigins: "*",
-        AllowCredentials: false,
-        AllowHeaders: "Origin, Content-Type, Accept",
-        AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
-    }))
-
-    s.app.Use("/ws", func(c *fiber.Ctx) error {
-        if websocket.IsWebSocketUpgrade(c) {
-            c.Locals("allowed", true)
-           // Your authentication process goes here. Get the Token from header and validate it
-           // Extract the claims from the token and set them to the Locals
-           // This is because you cannot access headers in the websocket.Conn object below
-           //c.Locals("GROUP", string(c.Request().Header.Peek("GROUP")))
-           //c.Locals("USER", string(c.Request().Header.Peek("USER")))
-           return c.Next()
-          }
-      return fiber.ErrUpgradeRequired
-    })
-}
-
-func (s *Server) handleSubscription(userId string, msg []byte) {
+func (s *Server) handleSubscription(userID string, msg []byte) {
     log.Println(string(msg))
     var payload struct {
         Event       string `json:"event"`
-        UserId      string `json:"userId,omitempty"`
-        TradeupId   string `json:"tradeupId,omitempty"`
+        UserID      string `json:"userID,omitempty"`
+        TradeupID   string `json:"tradeupID,omitempty"`
     }
 
     if err := json.Unmarshal(msg, &payload); err != nil {
@@ -148,7 +132,7 @@ func (s *Server) handleSubscription(userId string, msg []byte) {
     s.Lock()
     defer s.Unlock()
     
-    client, exists := s.clients[userId]
+    client, exists := s.clients[userID]
     if !exists {
         return
     }
@@ -156,8 +140,8 @@ func (s *Server) handleSubscription(userId string, msg []byte) {
     switch payload.Event {
     case "subscribe_all":
         client.SubscribedAll = true
-        client.SubscribedId = ""
-        temp := []structs.Tradeup{}
+        client.SubscribedID = ""
+        temp := []api.Tradeup{}
         for _, t := range s.tradeups {
             temp = append(temp, *t)
         }
@@ -165,14 +149,14 @@ func (s *Server) handleSubscription(userId string, msg []byte) {
         client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": temp})
     case "subscribe_one":
         client.SubscribedAll = false
-        client.SubscribedId = payload.TradeupId
-        t, exists := s.tradeups[payload.TradeupId]
+        client.SubscribedID = payload.TradeupID
+        t, exists := s.tradeups[payload.TradeupID]
         if exists {
             client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
         }
     case "unsubscribe":
         client.SubscribedAll = false
-        client.SubscribedId = ""
+        client.SubscribedID = ""
         client.Conn.WriteJSON(fiber.Map{"event": "unsync"})
     }
 }
@@ -183,7 +167,7 @@ func (s *Server) handleSubscription(userId string, msg []byte) {
 //    log.Println("Adding skin...")
 //    t, exists := s.tradeups[tradeupId]
 //    if !exists {
-//        t = &structs.Tradeup{Id: tradeupId, Skins: make(map[string]string)}
+//        t = &api.Tradeup{Id: tradeupId, Skins: make(map[string]string)}
 //        s.tradeups[tradeupId] = t
 //    }
 //
@@ -201,8 +185,8 @@ func (s *Server) broadcastState() {
     for _, client := range s.clients {
         if client.SubscribedAll {
             client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": s.tradeups})
-        } else if client.SubscribedId != "" {
-            if t, exists := s.tradeups[client.SubscribedId]; exists {
+        } else if client.SubscribedID != "" {
+            if t, exists := s.tradeups[client.SubscribedID]; exists {
                 client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
             }
         }

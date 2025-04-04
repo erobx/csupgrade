@@ -7,8 +7,8 @@ const baseUrl = "http://localhost:8080/auth"
 // {"username":"","email":"","password":""}
 export const submitSignup = async (username: string, email: string, password: string) => {
     const user = {
-        username: username,
         email: email,
+        username: username,
         password: password,
     }
 
@@ -31,7 +31,7 @@ export const submitSignup = async (username: string, email: string, password: st
 
 export default function SignUp() {
   const navigate = useNavigate()
-  const { loggedIn, setLoggedIn } = useAuth()
+  const { setUser, setLoggedIn } = useAuth()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -51,7 +51,8 @@ export default function SignUp() {
       const data = await submitSignup(username, email, password) 
       if (data) {
         setLoggedIn(true)
-        localStorage.setItem("jwt", data.JWT)
+        localStorage.setItem("jwt", data.jwt)
+        setUser(data.user)
         navigate("/")
         resetForm()
       } else {

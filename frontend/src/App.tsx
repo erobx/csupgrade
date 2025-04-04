@@ -11,13 +11,44 @@ import DashboardPage from './pages/DashboardPage'
 import StorePage from './pages/StorePage'
 import Navbar from './components/Navbar'
 import useAuth from './stores/authStore'
+import { useEffect, useState } from 'react'
 
 export default function App() {
-  const userId = "test"
-  const { loggedIn } = useAuth()
+  const { loggedIn, setUser, setLoggedIn } = useAuth()
+  const [userID, setUserID] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    async function fetchUser() {
+      setLoading(true)
+      const jwt = localStorage.getItem("jwt")
+      if (jwt) {
+        const res = await fetch(`http://localhost:8080/v1/users`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${jwt}`
+          }
+        })
+        const data = await res.json()
+        setUser(data.user)
+        setUserID(data.user.id)
+        setLoggedIn(true)
+      }
+      setLoading(false)
+    }
+
+    fetchUser()
+  },[])
+
+  if (loading) {
+    return (
+      <div className='loading-spinner loading-xs'></div>
+    )
+  }
+
   return (
-    <InventoryProvider userId={userId}>
-      <WebSocketProvider userId={userId}>
+    <InventoryProvider userId={userID}>
+      <WebSocketProvider userId={userID}>
           <WebSocketSubscriber />
           <Navbar />
           <Routes>

@@ -3,20 +3,20 @@ package api
 import "time"
 
 type NewUserRequest struct {
+	Email 	 string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type NewLoginRequest struct {
 	Email 	 string `json:"email"`
+	Password string `json:"password"`
 }
 
 type User struct {
-	Id 		 string 	`json:"userId"`
-	Username string 	`json:"username"`
-	Email 	 string 	`json:"email"`
-	Hash 	 string 	`json:"hash"`
-	Data 	 UserData 	`json:"userData"`
-}
-
-type UserData struct {
+	ID 		 			string 		`json:"id"`
+	Username 			string 		`json:"username"`
+	Email 	 			string 		`json:"email"`
 	Balance 			float64 	`json:"balance"`
 	AvatarSrc 			string 		`json:"avatarSrc"`
 	RefreshTokenVersion int 		`json:"refreshTokenVersion"`
@@ -24,18 +24,18 @@ type UserData struct {
 }
 
 type Inventory struct {
-    UserId  string  `json:"userId"`
+    UserID  string  `json:"userID"`
     Items   []Item  `json:"items"`
 }
 
 type Item struct {
-    InvId   int     `json:"invId"`
+    InvID   int     `json:"invID"`
     Data    any     `json:"data"`
     Visible bool    `json:"visible"`
 }
 
 type Tradeup struct {
-    Id      int     `json:"id"`
+    ID      int     `json:"id"`
     Rarity  string  `json:"rarity"`
     Items   []Item  `json:"items"`
     Locked  bool    `json:"locked"`
@@ -43,7 +43,7 @@ type Tradeup struct {
 }
 
 type Skin struct {
-    Id          int         `json:"id"`
+    ID          int         `json:"id"`
     Name        string      `json:"name"` // AWP | Dragon Lore
     Rarity      string      `json:"rarity"` // Covert
     Collection  string      `json:"collection"`// The ... Collection
