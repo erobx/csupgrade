@@ -5,6 +5,7 @@ import { Tradeup } from "../types/tradeup";
 export function useWebSocket(userId: string) {
   const [tradeups, setTradeups] = useState<Tradeup[]>([])
   const [currentTradeup, setCurrentTradeup] = useState<Tradeup | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
   //const { addItem } = useInventory()
   const ws = useRef<WebSocket>(null)
 
@@ -19,6 +20,7 @@ export function useWebSocket(userId: string) {
 
       ws.current.onopen = () => {
         console.log("WebSocket connected")
+        setIsConnected(true)
         //subscribeToAll() // default to all tradeups
       }
 
@@ -43,6 +45,7 @@ export function useWebSocket(userId: string) {
       ws.current.onclose = () => {
         console.log("WebSocket disconnected, reconnecting...")
         setTimeout(connectWebSocket, 2000) // Auto-reconnect
+        setIsConnected(false)
       }
     }
     
@@ -79,5 +82,5 @@ export function useWebSocket(userId: string) {
     }
   }
 
-  return { tradeups, currentTradeup, subscribeToAll, subscribeToTradeup, unsubscribe, sendLogin }
+  return { tradeups, currentTradeup, subscribeToAll, subscribeToTradeup, unsubscribe, sendLogin, isConnected }
 }

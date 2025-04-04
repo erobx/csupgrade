@@ -9,6 +9,7 @@ interface WebSocketContextType {
   subscribeToTradeup: (tradeupId: string) => void;
   unsubscribe: () => void;
   sendLogin: (userId: string) => void;
+  isConnected: boolean;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null)

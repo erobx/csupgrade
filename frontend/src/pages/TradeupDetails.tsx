@@ -1,22 +1,22 @@
 import { useWS } from "../providers/WebSocketProvider"
-import { useParams } from "react-router"
-import { useEffect } from "react"
+//import { useParams } from "react-router"
+//import { useEffect } from "react"
 import TradeupGrid from "../components/Tradeups/TradeupGrid"
 
 function TradeupDetails() {
-  const { tradeupId } = useParams<{ tradeupId: string}>()
-  const { currentTradeup, subscribeToTradeup, unsubscribe } = useWS()
+  //const { tradeupId } = useParams<{ tradeupId: string}>()
+  const { currentTradeup } = useWS()
   const textColor: string = ""
 
-  useEffect(() => {
-    if (tradeupId) {
-      subscribeToTradeup(tradeupId)
-    }
+  //useEffect(() => {
+  //  if (tradeupId) {
+  //    subscribeToTradeup(tradeupId)
+  //  }
 
-    return () => {
-      unsubscribe()
-    }
-  }, [tradeupId])
+  //  return () => {
+  //    unsubscribe()
+  //  }
+  //}, [tradeupId])
 
   return (
     <div className="flex flex-col items-center gap-2 mt-5">

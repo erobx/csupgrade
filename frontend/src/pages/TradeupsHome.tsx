@@ -1,20 +1,10 @@
-import { useEffect } from "react"
 import { useWS } from "../providers/WebSocketProvider"
 import { Tradeup } from "../types/tradeup"
 import TradeupRow from "../components/Tradeups/TradeupRow"
 
 function TradeupsHome() {
-  const { tradeups, subscribeToAll, unsubscribe } = useWS()
-
+  const { tradeups } = useWS()
   const players: any[] = []
-
-  useEffect(() => {
-    subscribeToAll()
-
-    return () => {
-      unsubscribe()
-    }
-  }, [])
 
   return (
     <div className="flex flex-col items-center gap-2 mt-3">
