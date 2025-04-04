@@ -1,4 +1,4 @@
-package internal
+package app
 
 import (
 	"encoding/json"
@@ -94,7 +94,7 @@ func NewServer(addr string) *Server {
     s.tradeups["2"] = t2
 
     s.useMiddleware()
-    s.mapHandlers()
+    s.Routes()
 
     return s
 }
@@ -130,85 +130,6 @@ func (s *Server) useMiddleware() {
           }
       return fiber.ErrUpgradeRequired
     })
-}
-
-func (s *Server) mapHandlers() {
-    s.app.Get("/", func(c *fiber.Ctx) error {
-        return c.SendString("Hello, world!")
-    })
-
-    v1 := s.app.Group("v1")
-    v1.Get("/inventory", s.getInventory())
-
-    s.app.Get("/ws", websocket.New(s.handleWebSocket))
-}
-
-func (s *Server) getInventory() fiber.Handler {
-    return func(c *fiber.Ctx) error {
-        userId := c.Query("userId")
-        log.Printf("Requesting inventory for %s\n", userId)
-
-        
-
-        items := []structs.Item{
-            {
-                InvId: 1,
-                Data: s1,
-                Visible: true,
-            },{
-                InvId: 2,
-                Data: s2,
-                Visible: true,
-            },
-        }
-
-        inventory := structs.Inventory{
-            UserId: userId,
-            Items: items,
-        }
-
-        return c.JSON(inventory)
-    }
-}
-
-func (s *Server) handleWebSocket(c *websocket.Conn) {
-    log.Printf("New connection\n")
-    userId := c.Query("userId")
-
-    sessionId := ""
-    if userId == "" {
-        sessionId = "test"
-        userId = sessionId
-    }
-
-    client := &Client{
-        Conn: c,
-        UserId: userId,
-        SessionId: sessionId,
-        SubscribedAll: false,
-        SubscribedId: "",
-    }
-
-    s.Lock()
-    s.clients[userId] = client
-    s.Unlock()
-
-    defer func() {
-        s.Lock()
-        delete(s.clients, userId)
-        s.Unlock()
-        c.Close()
-    }()
-
-    for {
-        _, msg, err := c.ReadMessage()
-        if err != nil {
-            log.Println("WebSocket closed for", userId, ":", err)
-            break
-        }
-
-        s.handleSubscription(userId, msg)
-    }
 }
 
 func (s *Server) handleSubscription(userId string, msg []byte) {
