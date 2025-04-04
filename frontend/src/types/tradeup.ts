@@ -7,3 +7,8 @@ export type Tradeup = {
   items: InventoryItem[];
   status: string;
 }
+
+export type Player = {
+  username: string;
+  avatar: string;
+}

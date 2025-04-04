@@ -3,10 +3,13 @@ module github.com/erobx/tradeups-backend
 go 1.24.0
 
 require (
+	github.com/gofiber/contrib/websocket v1.3.3
+	github.com/gofiber/fiber/v2 v2.52.6
+)
+
+require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/fasthttp/websocket v1.5.8 // indirect
-	github.com/gofiber/contrib/websocket v1.3.3 // indirect
-	github.com/gofiber/fiber/v2 v2.52.6 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

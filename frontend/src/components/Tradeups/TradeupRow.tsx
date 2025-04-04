@@ -1,18 +1,21 @@
 import { useNavigate } from "react-router";
 import { InventoryItem } from "../../types/inventory"
-import ImageCarousel from "../ImageCarousel";
 import { Skin } from "../../types/skin";
+import { Player } from "../../types/tradeup";
+import ImageCarousel from "../ImageCarousel";
+import AvatarGroup from "../AvatarGroup";
+import { dividerMap } from "../../constants/constants";
 
 interface TradeupRowProps {
   id: string;
-  players: any[];
+  players: Player[];
   rarity: string;
   items: InventoryItem[];
   status: string;
 }
 
 export default function TradeupRow({ id, players, rarity, items, status }: TradeupRowProps) {
-  const dividerColor: string = ""
+  const dividerColor: string = dividerMap[rarity]
   const totalPrice: number = 0
 
   const skins: Skin[] = items.filter(item =>
@@ -89,7 +92,7 @@ function DetailsPanel({ total }: { total: number }) {
   )
 }
 
-function PlayersPanel({ players }: { players: any[] }) {
+function PlayersPanel({ players }: { players: Player[] }) {
   return (
     <div className="card card-sm">
       <div className="card-body justify-center">
@@ -97,7 +100,6 @@ function PlayersPanel({ players }: { players: any[] }) {
           <div className="card-title">
             Players
           </div>
-          {/*
           <div className="card-title">
             {players.length !== 0 ? (
               <AvatarGroup
@@ -107,7 +109,6 @@ function PlayersPanel({ players }: { players: any[] }) {
               <div>None</div>
             )}
           </div>
-          */}
         </div>
       </div>
     </div>

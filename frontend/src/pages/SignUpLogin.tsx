@@ -1,5 +1,6 @@
 import { useState } from "react"
 import Login from "../components/Login"
+import SignUp from "../components/SignUp"
 
 export default function SignUpLogin() {
   const [formState, setFormState] = useState("LOGIN")
@@ -29,7 +30,7 @@ export default function SignUpLogin() {
           <h1 className="font-bold mt-5">
               Welcome to TradeUps!
           </h1>
-          {/*<SignUp />*/}
+          <SignUp />
           <div className="flex gap-1">
               <p>Already have an account?</p>
               <a className="link link-info" onClick={handleFormChange}>Login here</a>

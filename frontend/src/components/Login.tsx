@@ -4,31 +4,6 @@ import { useState } from "react"
 
 const baseUrl = "http://localhost:8080/auth"
 
-// {"username":"","email":"","password":""}
-export const submitSignup = async (username: string, email: string, password: string) => {
-    const user = {
-        username: username,
-        email: email,
-        password: password,
-    }
-
-    const opts = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user)
-    }
-
-    try {
-        const res = await fetch(baseUrl+"/register", opts)
-        const data = await res.json()
-        return data
-    } catch (error) {
-        console.error('Error:', error)
-    }
-}
-
 export const submitLogin = async (email: string, password: string) => {
     const creds = {
         email: email,

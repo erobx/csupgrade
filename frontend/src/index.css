@@ -2,3 +2,203 @@
 @plugin "daisyui" {
     themes: dim --default, retro --preferslight;
 }
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+:root {
+    --consumer: #b0c3d9;
+    --industrial: #5e98d9;
+    --milspec: #4b69ff;
+    --restricted: #8847ff;
+    --classified: #d32ce6;
+    --covert: #eb4b4b;
+    --contraband: #e4ae39;
+}
+
+.divider-horizontal {
+    @apply w-1;
+}
+
+.badge-consumer {
+    --badge-color: var(--consumer);
+    color: black;
+}
+
+.badge-industrial {
+    --badge-color: var(--industrial);
+    color: black;
+}
+
+.badge-milspec {
+    --badge-color: var(--milspec);
+    color: black;
+}
+
+.badge-restricted {
+    --badge-color: var(--restricted);
+    color: black;
+}
+
+.badge-classified {
+    --badge-color: var(--classified);
+    color: black;
+}
+
+.badge-covert {
+    --badge-color: var(--covert);
+    color: black;
+}
+
+.badge-contraband {
+    --badge-color: var(--contraband);
+    color: black;
+}
+
+.badge-stattrak {
+    --badge-color: rgba(255,136,18,1);
+    color: black;
+}
+
+.outline-consumer {
+   outline-color: var(--consumer);
+}
+
+.outline-industrial {
+   outline-color: var(--industrial);
+}
+
+.outline-milspec {
+   outline-color: var(--milspec);
+}
+
+.outline-restricted {
+   outline-color: var(--restricted);
+}
+
+.outline-classified {
+   outline-color: var(--classified);
+}
+
+.outline-covert {
+   outline-color: var(--covert);
+}
+
+.outline-contraband {
+   outline-color: var(--contraband);
+}
+
+.bg-consumer {
+    background-color: var(--consumer);
+}
+
+.bg-industrial {
+    background-color: var(--industrial);
+}
+
+.bg-milspec {
+    background-color: var(--milspec);
+}
+
+.bg-restricted {
+    background-color: var(--restricted);
+}
+
+.bg-classified {
+    background-color: var(--classified);
+}
+
+.bg-covert {
+    background-color: var(--covert);
+}
+
+.bg-contraband {
+    background-color: var(--contraband);
+}
+
+.divider-consumer {
+    background-color: var(--consumer);
+}
+
+.divider-industrial {
+    background-color: var(--industrial);
+}
+
+.divider-milspec {
+    background-color: var(--milspec);
+}
+
+.divider-restricted {
+    background-color: var(--restricted);
+}
+
+.divider-classified {
+    background-color: var(--classified);
+}
+
+.divider-covert {
+    background-color: var(--covert);
+}
+
+.divider-contraband {
+    background-color: var(--contraband);
+}
+
+.text-consumer {
+    color: var(--consumer);
+}
+
+.text-industrial {
+    color: var(--industrial);
+}
+
+.text-milspec {
+    color: var(--milspec);
+}
+
+.text-restricted {
+    color: var(--restricted);
+}
+
+.text-classified {
+    color: var(--classified);
+}
+
+.text-covert {
+    color: var(--covert);
+}
+
+.text-contraband {
+    color: var(--contraband);
+}
+
+.btn-consumer {
+    color: var(--consumer);
+}
+
+.btn-industrial {
+    color: var(--industrial);
+}
+
+.btn-milspec {
+    color: var(--milspec);
+}
+
+.btn-restricted {
+    color: var(--restricted);
+}
+
+.btn-classified {
+    color: var(--classified);
+}
+
+.btn-covert {
+    color: var(--covert);
+}
+
+.btn-contraband {
+    color: var(--contraband);
+}

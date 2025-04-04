@@ -8,6 +8,7 @@ import TradeupsHome from './pages/TradeupsHome'
 import TradeupDetails from './pages/TradeupDetails'
 import InventoryPage from './pages/InventoryPage'
 import DashboardPage from './pages/DashboardPage'
+import StorePage from './pages/StorePage'
 import Navbar from './components/Navbar'
 import useAuth from './stores/authStore'
 
@@ -27,6 +28,7 @@ export default function App() {
               <Route path=":tradeupId" element={<TradeupDetails />} />
             </Route>
             <Route path="inventory" element={<InventoryPage />} />
+            <Route path="store" element={<StorePage />} />
           </Routes>
       </WebSocketProvider>
     </InventoryProvider>
