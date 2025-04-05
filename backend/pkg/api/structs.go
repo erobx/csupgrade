@@ -24,12 +24,12 @@ type User struct {
 }
 
 type Inventory struct {
-    UserID  string  `json:"userID"`
+    UserID  string  `json:"userId"`
     Items   []Item  `json:"items"`
 }
 
 type Item struct {
-    InvID   int     `json:"invID"`
+    InvID   int     `json:"invId"`
     Data    any     `json:"data"`
     Visible bool    `json:"visible"`
 }
@@ -54,8 +54,4 @@ type Skin struct {
     WasWon      bool        `json:"wasWon"`
     ImgSrc      string      `json:"imgSrc"`
     CreatedAt   time.Time   `json:"createdAt"`
-}
-
-type Event struct {
-	
 }

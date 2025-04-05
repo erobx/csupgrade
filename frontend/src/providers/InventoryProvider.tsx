@@ -20,8 +20,15 @@ export function InventoryProvider({ children, userId }: InventoryProviderProps) 
 
   useEffect(() => {
     async function fetchInventory() {
-      const res = await fetch(`/v1/inventory?userId=${userId}`)
+      const jwt = localStorage.getItem("jwt")
+      const res = await fetch(`http://localhost:8080/v1/users/inventory?userId=${userId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        }
+      })
       const data: Inventory = await res.json()
+      console.log(data)
       setInventory(data)
     }
     if (userId) {

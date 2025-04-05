@@ -11,9 +11,15 @@ import (
 
 // Contains methods for interacting with the DB
 type Storage interface {
+	// User updates
 	CreateUser(request *api.NewUserRequest) (string, error)
 	GetUserByID(userID string) (api.User, error)
 	GetUserAndHashByEmail(email string) (api.User, string, error)
+	GetInventory(userID string) (api.Inventory, error)
+
+	// Store
+	UpdateBalance(crateID, userID string) error
+	AddSkinsToInventory(userID string) error
 }
 
 type storage struct {
@@ -65,4 +71,53 @@ func (s *storage) GetUserAndHashByEmail(email string) (api.User, string, error) 
 	// TODO: generate url for avatarKey, then assign to user.AvatarSrc
 
 	return user, hash, err
+}
+
+func (s *storage) GetInventory(userID string) (api.Inventory, error) {
+	inventory := api.Inventory{
+		UserID: userID,
+		Items: make([]api.Item, 0),
+	}
+
+	q := `
+	select i.id, i.skin_id, i.wear_str, i.wear_num, i.price, i.is_stattrak,
+		i.was_won, i.created_at, i.visible, s.name, s.rarity, s.collection, s.image_key
+	from inventory i
+	join skins s on s.id = i.skin_id
+		where i.user_id = $1
+	`
+	rows, err := s.db.Query(context.Background(), q, userID)
+	if err != nil {
+		return inventory, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item api.Item
+		var skin api.Skin
+		var imageKey string
+
+		err := rows.Scan(&item.InvID, &skin.ID, &skin.Wear, &skin.Float, &skin.Price,
+						&skin.IsStatTrak, &skin.WasWon, &skin.CreatedAt, &item.Visible,
+						&skin.Name, &skin.Rarity, &skin.Collection, &imageKey)
+		if err != nil {
+			return inventory, err
+		}
+
+		item.Data = skin
+		inventory.Items = append(inventory.Items, item)
+	}
+
+	return inventory, nil
+}
+
+func (s *storage) UpdateBalance(crateID, userID string) error {
+
+	q := `select cost from crates where id=$1`
+
+	return nil
+}
+
+func (s *storage) AddSkinsToInventory(userID string) error {
+	return nil
 }

@@ -7,16 +7,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// insert new user, login a user, get user details (inventory, recents, stats, etc.),
+// update user (update balance, insert new items, delete items, etc.), buy items
+
+// Responsible for every user interaction, new, remove, updates
 type UserService interface {
 	New(user *NewUserRequest) (string, error)
 	Login(request NewLoginRequest) (User, error)
 	GetUser(userID string) (User, error)
+	GetInventory(userID string) (Inventory, error)
 }
 
 type UserRepository interface {
 	CreateUser(*NewUserRequest) (string, error)
 	GetUserByID(userID string) (User, error)
 	GetUserAndHashByEmail(email string) (User, string, error)
+	GetInventory(userID string) (Inventory, error)
 }
 
 type userService struct {
@@ -77,6 +83,10 @@ func (u *userService) GetUser(userID string) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (u *userService) GetInventory(userID string) (Inventory, error) {
+	return u.storage.GetInventory(userID)
 }
 
 /*

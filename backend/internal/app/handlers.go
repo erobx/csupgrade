@@ -109,33 +109,50 @@ func (s *Server) getUser() fiber.Handler {
 
 func (s *Server) getInventory() fiber.Handler {
     return func(c *fiber.Ctx) error {
-        userID := c.Query("userID")
+        userID := c.Query("userId")
+
+		jwtUser := c.Locals("user").(*jwt.Token)
+		claims := jwtUser.Claims.(jwt.MapClaims)
+		jwtUserID := claims["id"].(string)
+
+		if userID != jwtUserID {
+			log.Println("userID not the same as jwtID")
+			log.Printf("%s\n %s\n", userID, jwtUserID)
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
         log.Printf("Requesting inventory for %s\n", userID)
 
-        items := []api.Item{
-            {
-                InvID: 1,
-                Data: s1,
-                Visible: true,
-            },{
-                InvID: 2,
-                Data: s2,
-                Visible: true,
-            },
-        }
-
-        inventory := api.Inventory{
-            UserID: userID,
-            Items: items,
-        }
+        inventory, err := s.userService.GetInventory(userID)
+		if err != nil {
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
 
         return c.JSON(inventory)
     }
 }
 
+func (s *Server) getRecentTradeups() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userID := c.Params("userId")
+		log.Println("Getting recent tradeups for:", userID)
+
+		return nil
+	}
+}
+
+func (s *Server) getUserStats() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userID := c.Params("userId")
+		log.Println("Retrieving stats for:", userID)
+
+		return nil
+	}
+}
+
 func (s *Server) handleWebSocket(c *websocket.Conn) {
     log.Printf("New connection\n")
-    userID := c.Query("userID")
+    userID := c.Query("userId")
 
     sessionID := ""
     if userID == "" {
