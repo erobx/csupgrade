@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/erobx/tradeups-backend/pkg/api"
@@ -40,8 +41,7 @@ func (s *Server) register() fiber.Handler {
 			"exp": time.Now().Add(time.Hour * 23).Unix(),
 		}
 
-		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-		t, err := token.SignedString(s.privateKey)
+		t, err := s.issueNewToken(claims)
 		if err != nil {
 			log.Printf("token.SignedString: %v", err)
 			return c.SendStatus(fiber.StatusInternalServerError)
@@ -76,11 +76,10 @@ func (s *Server) login() fiber.Handler {
 			"exp": time.Now().Add(time.Hour * 23).Unix(),
 		}
 
-		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-		t, err := token.SignedString(s.privateKey)
+		t, err := s.issueNewToken(claims)
 		if err != nil {
 			log.Printf("token.SignedString: %v", err)
-		  return c.SendStatus(fiber.StatusInternalServerError)
+			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
 		return c.JSON(fiber.Map{
@@ -110,14 +109,11 @@ func (s *Server) getUser() fiber.Handler {
 func (s *Server) getInventory() fiber.Handler {
     return func(c *fiber.Ctx) error {
         userID := c.Query("userId")
-
-		jwtUser := c.Locals("user").(*jwt.Token)
-		claims := jwtUser.Claims.(jwt.MapClaims)
-		jwtUserID := claims["id"].(string)
-
-		if userID != jwtUserID {
-			log.Println("userID not the same as jwtID")
-			log.Printf("%s\n %s\n", userID, jwtUserID)
+		jwtUserID := GetUserIDFromClaims(c)
+		
+		err := s.validator.ValidateUserID(userID, jwtUserID)
+		if err != nil {
+			log.Println(err)
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
@@ -147,6 +143,33 @@ func (s *Server) getUserStats() fiber.Handler {
 		log.Println("Retrieving stats for:", userID)
 
 		return nil
+	}
+}
+
+func (s *Server) buyCrate() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userID := c.Query("userId")
+		crateID := c.Query("crateId")
+		amount, _ := strconv.Atoi(c.Query("amount"))
+
+		jwtUserID := GetUserIDFromClaims(c)
+		
+		err := s.validator.ValidateUserID(userID, jwtUserID)
+		if err != nil {
+			log.Println(err)
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+		
+		updatedBalance, addedItems, err := s.storeService.BuyCrate(crateID, userID, amount)
+		if err != nil {
+			log.Println(err)
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		return c.JSON(fiber.Map{
+			"balance": updatedBalance,
+			"items": addedItems,
+		})
 	}
 }
 

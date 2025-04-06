@@ -32,13 +32,14 @@ func main() {
 
 	storage := repository.NewStorage(db)
 	userService := api.NewUserService(storage)
+	storeService := api.NewStoreService(storage)
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(os.Getenv("RSA_PRIVATE_KEY")))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	server := app.NewServer("8080", privateKey, userService)
+	server := app.NewServer("8080", privateKey, userService, storeService)
 	server.Run()
 }
 

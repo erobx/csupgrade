@@ -1,9 +1,10 @@
 import { Link } from "react-router";
 import useAuth from "../stores/authStore";
 import Dropdown from "./Dropdown";
+import Balance from "./Balance";
 
 export default function Navbar() {
-  const { loggedIn, setLoggedIn } = useAuth()
+  const { user, loggedIn, setLoggedIn } = useAuth()
 
   return (
     <div className="navbar border-b bg-base-200 shadow-sm">
@@ -19,9 +20,9 @@ export default function Navbar() {
         </div>
       )}
 
-      {loggedIn && (
+      {loggedIn && user && (
           <div className="navbar-end mr-1">
-            {/*<Balance balance={user.balance} />*/}
+            <Balance balance={user.balance} />
             <Link to="/store" className="btn btn-ghost text-lg">Store</Link>
             <Link to="/dashboard" className="btn btn-ghost text-lg">Dashboard</Link>
             <Dropdown

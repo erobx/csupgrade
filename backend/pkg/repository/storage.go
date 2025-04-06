@@ -18,8 +18,7 @@ type Storage interface {
 	GetInventory(userID string) (api.Inventory, error)
 
 	// Store
-	UpdateBalance(crateID, userID string) error
-	AddSkinsToInventory(userID string) error
+	BuyCrate(crateID, userID string, amount int) (float64, []api.Item, error)
 }
 
 type storage struct {
@@ -111,13 +110,23 @@ func (s *storage) GetInventory(userID string) (api.Inventory, error) {
 	return inventory, nil
 }
 
-func (s *storage) UpdateBalance(crateID, userID string) error {
+func (s *storage) BuyCrate(crateID, userID string, amount int) (float64, []api.Item, error) {
+	var updatedBalance float64
+	var addedItems []api.Item
 
-	q := `select cost from crates where id=$1`
+	q := `
+	with updated as (
+		update users
+		set balance = balance - ((select cost from crates where id=$1) * $2)
+		where id = (select id from users where id=$3)
+		and balance >= ((select cost from crates where id=$1) * $2)
+		returning balance
+	) select * from updated
+	`
+	err := s.db.QueryRow(context.Background(), q, crateID, amount, userID).Scan(&updatedBalance)
+	if err != nil {
+		return updatedBalance, addedItems, err
+	}
 
-	return nil
-}
-
-func (s *storage) AddSkinsToInventory(userID string) error {
-	return nil
+	return updatedBalance, addedItems, nil
 }

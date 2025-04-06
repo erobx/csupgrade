@@ -43,20 +43,24 @@ var (
 
 type Server struct {
     sync.Mutex
-    addr        string
-    app         *fiber.App
-	privateKey *rsa.PrivateKey
-	userService api.UserService
-    clients     map[string]*Client
-    tradeups    map[string]*api.Tradeup // REPLACE WITH DB
+    addr        	string
+	privateKey 		*rsa.PrivateKey
+    app         	*fiber.App
+	validator 		Validator
+	userService 	api.UserService
+	storeService 	api.StoreService
+    clients     	map[string]*Client
+    tradeups    	map[string]*api.Tradeup // REPLACE WITH DB
 }
 
-func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService) *Server {
+func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.StoreService) *Server {
     s := &Server{
         addr: addr,
         app: fiber.New(),
+		validator: NewValidator(),
 		privateKey: privKey,
 		userService: us,
+		storeService: ss,
         clients: make(map[string]*Client),
         tradeups: map[string]*api.Tradeup{},
     }

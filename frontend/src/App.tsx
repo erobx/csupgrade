@@ -23,16 +23,50 @@ export default function App() {
       setLoading(true)
       const jwt = localStorage.getItem("jwt")
       if (jwt) {
-        const res = await fetch(`http://localhost:8080/v1/users`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${jwt}`
+        try {
+          const res = await fetch(`http://localhost:8080/v1/users`, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${jwt}`
+            }
+          })
+
+          if (res.status === 401) {
+            const newToken = res.headers.get("X-New-Token")
+            if (newToken) {
+              localStorage.setItem("jwt", newToken)
+
+              const retryRes = await fetch(`http://localhost:8080/v1/users`, {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${newToken}`
+                }
+              })
+
+              if (retryRes.ok) {
+                const data = await retryRes.json()
+                setUser(data.user)
+                setUserID(data.user.id)
+                setLoggedIn(true)
+              } else {
+                throw new Error("Failed to fetch user after token refresh")
+              }
+            } else {
+              throw new Error("Token expired and refresh failed")
+            }
+          } else if (res.ok) {
+            const data = await res.json()
+            setUser(data.user)
+            setUserID(data.user.id)
+            setLoggedIn(true)
+          } else {
+            throw new Error("Error fetching user data")
           }
-        })
-        const data = await res.json()
-        setUser(data.user)
-        setUserID(data.user.id)
-        setLoggedIn(true)
+        } catch (error) {
+          console.error("Error loading user:", error)
+          setLoggedIn(false)
+          setUser(null)
+        }
       }
       setLoading(false)
     }

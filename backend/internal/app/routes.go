@@ -17,10 +17,12 @@ func (s *Server) ProtectedRoutes() {
 
 	// v1/users/*
 	users := v1.Group("users")
+
 	users.Get("/", s.getUser())
     users.Get("/inventory", s.getInventory())
 	users.Get("/:userId/recents", s.getRecentTradeups())
 	users.Get("/:userId/stats", s.getUserStats())
 
-
+	store := v1.Group("store")
+	store.Put("/buy", s.buyCrate())
 }

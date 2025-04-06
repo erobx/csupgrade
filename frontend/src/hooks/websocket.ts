@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Tradeup } from "../types/tradeup";
-//import { useInventory } from "../providers/InventoryProvider";
+import { useInventory } from "../providers/InventoryProvider";
 
 export function useWebSocket(userId: string) {
   const [tradeups, setTradeups] = useState<Tradeup[]>([])
   const [currentTradeup, setCurrentTradeup] = useState<Tradeup | null>(null)
   const [isConnected, setIsConnected] = useState(false)
-  //const { addItem } = useInventory()
+  const { addItem } = useInventory()
   const ws = useRef<WebSocket>(null)
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export function useWebSocket(userId: string) {
             //addItem({ ...data.winningItem, visible: true })
           }
         } else if (data.event === "new_item") {
-          //addItem({ ...data.item, visible: true })
+          addItem({ ...data.item, visible: true })
         }
       }
 
