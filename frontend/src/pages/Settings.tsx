@@ -1,9 +1,17 @@
-
+import { useEffect } from "react"
+import { themeChange } from "theme-change"
 
 export default function Settings() {
   const onClick = (e: any) => {
     localStorage.setItem("theme", e.target.value)
+    window.location.reload()
   }
+
+  const themes = ["dim", "light", "retro", "forest", "synthwave", "nord"]
+
+  useEffect(() => {
+    themeChange(false)
+  }, [])
 
   return (
     <div className="flex justify-center mt-4">
@@ -13,7 +21,7 @@ export default function Settings() {
         </div>
         <div className="card-body">
           <h1 className="font-bold text-lg">Change theme</h1>
-          <div className="dropdown mb-72">
+          <div data-choose-theme className="dropdown mb-72">
             <div tabIndex={0} role="button" className="btn m-1">
               Theme
               <svg
@@ -26,36 +34,18 @@ export default function Settings() {
               </svg>
             </div>
             <ul tabIndex={0} className="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl">
-              <li>
-                <input
-                  type="radio"
-                  name="theme-dropdown"
-                  className="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                  aria-label="Default"
-                  value="dim"
-                  onClick={onClick}
-                />
-              </li>
-              <li>
-                <input
-                  type="radio"
-                  name="theme-dropdown"
-                  className="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                  aria-label="Light"
-                  value="light"
-                  onClick={onClick}
-                />
-              </li>
-              <li>
-                <input
-                  type="radio"
-                  name="theme-dropdown"
-                  className="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                  aria-label="Retro"
-                  value="retro" 
-                  onClick={onClick}
-                />
-              </li>
+              {themes.map(theme => (
+                <li>
+                  <input
+                    type="radio"
+                    name="theme-dropdown"
+                    className="theme-controller btn btn-sm btn-block btn-ghost justify-start"
+                    aria-label={theme.charAt(0).toUpperCase()+theme.slice(1,theme.length+1)}
+                    value={theme}
+                    onClick={onClick}
+                  />
+                </li>
+              ))}
             </ul>
           </div>
         </div>
