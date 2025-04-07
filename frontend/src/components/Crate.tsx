@@ -1,4 +1,6 @@
+import { useInventory } from "../providers/InventoryProvider";
 import useAuth from "../stores/authStore"
+import { InventoryItem } from "../types/inventory";
 
 type CrateProps = {
   crateId: string;
@@ -7,8 +9,14 @@ type CrateProps = {
   setErrorMessage: (msg: string) => void;
 }
 
+type Response = {
+  balance: number;
+  items: InventoryItem[];
+}
+
 export default function Crate({ crateId, name, amount, setErrorMessage }: CrateProps) {
   const { user, setBalance } = useAuth()
+  const { addItem } = useInventory()
 
   const handleSubmit = async () => {
     const jwt = localStorage.getItem("jwt")
@@ -16,7 +24,7 @@ export default function Crate({ crateId, name, amount, setErrorMessage }: CrateP
       try {
         const res = await fetch(`
           http://localhost:8080/v1/store/buy?userId=${user.id}&crateId=${crateId}&amount=${amount}`, {
-          method: "PUT",
+          method: "POST",
           headers: {
             Authorization: `Bearer ${jwt}`,
           },
@@ -27,7 +35,13 @@ export default function Crate({ crateId, name, amount, setErrorMessage }: CrateP
           return
         }
 
-        const data = await res.json()
+        const data: Response = await res.json()
+        if (data.items) {
+          data.items.map(item => {
+            addItem(item)
+          })
+        }
+
         setBalance(data.balance)
       } catch (error) {
         console.error(error)

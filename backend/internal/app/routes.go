@@ -24,5 +24,5 @@ func (s *Server) ProtectedRoutes() {
 	users.Get("/:userId/stats", s.getUserStats())
 
 	store := v1.Group("store")
-	store.Put("/buy", s.buyCrate())
+	store.Post("/buy", s.buyCrate())
 }

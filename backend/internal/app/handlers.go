@@ -160,6 +160,7 @@ func (s *Server) buyCrate() fiber.Handler {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 		
+		log.Printf("User %s buying crate %s - %d\n", userID, crateID, amount)
 		updatedBalance, addedItems, err := s.storeService.BuyCrate(crateID, userID, amount)
 		if err != nil {
 			log.Println(err)
