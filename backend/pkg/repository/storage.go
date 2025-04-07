@@ -20,6 +20,7 @@ type Storage interface {
 	GetUserByID(userID string) (api.User, error)
 	GetUserAndHashByEmail(email string) (api.User, string, error)
 	GetInventory(userID string) (api.Inventory, error)
+	GetRecentTradeups(userID string) ([]api.Tradeup, error)
 
 	// Store
 	BuyCrate(crateID, userID string, amount int) (float64, []api.Item, error)
@@ -113,6 +114,16 @@ func (s *storage) GetInventory(userID string) (api.Inventory, error) {
 
 	return inventory, nil
 }
+
+func (s *storage) GetRecentTradeups(userID string) ([]api.Tradeup, error) {
+	var recentTradeups []api.Tradeup
+
+	return recentTradeups, nil
+}
+
+/*
+Functions relating to the store service
+*/
 
 func (s *storage) BuyCrate(crateID, userID string, amount int) (float64, []api.Item, error) {
 	var updatedBalance float64

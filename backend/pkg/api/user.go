@@ -16,6 +16,7 @@ type UserService interface {
 	Login(request NewLoginRequest) (User, error)
 	GetUser(userID string) (User, error)
 	GetInventory(userID string) (Inventory, error)
+	GetRecentTradeups(userID string) ([]Tradeup, error)
 }
 
 type UserRepository interface {
@@ -23,6 +24,7 @@ type UserRepository interface {
 	GetUserByID(userID string) (User, error)
 	GetUserAndHashByEmail(email string) (User, string, error)
 	GetInventory(userID string) (Inventory, error)
+	GetRecentTradeups(userID string) ([]Tradeup, error)
 }
 
 type userService struct {
@@ -87,6 +89,10 @@ func (u *userService) GetUser(userID string) (User, error) {
 
 func (u *userService) GetInventory(userID string) (Inventory, error) {
 	return u.storage.GetInventory(userID)
+}
+
+func (u *userService) GetRecentTradeups(userID string) ([]Tradeup, error) {
+	return u.storage.GetRecentTradeups(userID)
 }
 
 /*
