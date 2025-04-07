@@ -29,5 +29,6 @@ func (s *Server) ProtectedRoutes() {
 
 	// v1/tradeups/*
 	tradeups := v1.Group("tradeups")
-	tradeups.Put("/:tradeupId", s.addSkinToTradeup())
+	tradeups.Put("/:tradeupId/add", s.addSkinToTradeup())
+	tradeups.Delete("/:tradeupId/remove", s.removeSkinFromTradeup())
 }

@@ -1,24 +1,15 @@
-
-//export default function CountdownTimer() {
-{/* For TSX uncomment the commented types below */}
-//<span className="countdown font-mono text-2xl">
-//  <span style={{"--value":10} } aria-live="polite" aria-label={counter}>10</span>
-//  <span style={{"--value":24} } aria-live="polite" aria-label={counter}>24</span>
-//  <span style={{"--value":59} } aria-live="polite" aria-label={counter}>59</span>
-//</span>
-//}
-
 import { useState, useEffect } from 'react';
 
-export default function CountdownTimer({ stopTime }: { stopTime: Date }) {
+export default function CountdownTimer({ stopTime }: { stopTime: any }) {
   const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining());
 
   function calculateTimeRemaining() {
     // Parse the stopTime (assuming it's a valid ISO date string)
-    const now: Date = new Date();
+    const stopDate = new Date(stopTime)
+    const now = new Date();
     
     // Calculate the difference
-    const difference = stopTime - now;
+    const difference = stopDate - now;
     
     // If time has passed, return all zeros
     if (difference <= 0) {

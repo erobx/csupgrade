@@ -159,12 +159,14 @@ func (s *Server) broadcastState() {
         if client.SubscribedAll {
 			tradeups, err := s.tradeupService.GetAllTradeups()
 			if err != nil {
+				log.Println(err)
 				return
 			}
             client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": tradeups})
         } else if client.SubscribedID != "" {
 			t, err := s.tradeupService.GetTradeupByID(client.SubscribedID)
 			if err != nil {
+				log.Println(err)
 				return 
 			}
 			client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})

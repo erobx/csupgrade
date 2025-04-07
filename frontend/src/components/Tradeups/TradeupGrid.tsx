@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useInventory } from "../../providers/InventoryProvider";
 import { InventoryItem } from "../../types/inventory";
 import { Skin } from "../../types/skin";
@@ -12,7 +13,7 @@ type TradeupGridProps = {
 }
 
 export default function TradeupGrid({ tradeupId, rarity, items, status}: TradeupGridProps) {
-  const { ownsItem } = useInventory()
+  const { ownsItem, setItemVisibility } = useInventory()
 
   const skins: Skin[] = items.filter(item => 
     item.data && typeof item.data === 'object' && 'id' in item.data &&
@@ -35,6 +36,7 @@ export default function TradeupGrid({ tradeupId, rarity, items, status}: Tradeup
           imgSrc={skin.imgSrc}
           owned={owernship[index]}
           status={status}
+          setItemVisibility={setItemVisibility}
         />
       ))}
       {items.length < 10 && (
@@ -55,13 +57,14 @@ type GridItemProps = {
   imgSrc: string;
   owned: boolean;
   status: string;
+  setItemVisibility: (invId: string, visible: boolean) => void;
 }
 
-function GridItem({ invId, tradeupId, name, wear, price, isStatTrak, imgSrc, owned, status}: GridItemProps) {
+function GridItem({ invId, tradeupId, name, wear, price, isStatTrak, imgSrc, owned, status, setItemVisibility }: GridItemProps) {
   const outlineColor = owned ? "outline-accent" : "outline-error"
 
   const onSelect = () => {
-    if (owned && status === "Active") {
+    if (owned && status !== "Completed") {
       document.getElementById(`modal_${invId}`).showModal()
     }
   }
@@ -95,31 +98,45 @@ function GridItem({ invId, tradeupId, name, wear, price, isStatTrak, imgSrc, own
           {isStatTrak && <StatTrakBadge />}
         </div>
       </div>
-      <Modal invId={invId} tradeupId={tradeupId} />
+      <Modal invId={invId} tradeupId={tradeupId} setItemVisibility={setItemVisibility} />
     </div>
   )
 }
 
-function Modal({ invId, tradeupId }: { invId: string, tradeupId: string }) {
-  const onClick = async () => {
-    //const jwt = localStorage.getItem("jwt")
-    //const data = await removeSkinFromTradeup(jwt, invId, tradeupId)
-    //if (data) {
-    //  addItem(data)
-    //} else {
-    //  return
-    //}
-    //console.log(`Removed skin ${invId} from tradeup ${tradeupId}`)
+type ModalProps = {
+  invId: string;
+  tradeupId: string;
+  setItemVisibility: (invId: string, visible: boolean) => void;
+}
 
-    // add item back to inventory
-    //addItem()
+function Modal({ invId, tradeupId, setItemVisibility }: ModalProps) {
+  const onClick = async () => {
+    const jwt = localStorage.getItem("jwt")
+    try {
+      const res = await fetch(`http://localhost:8080/v1/tradeups/${tradeupId}/remove?invId=${invId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        }
+      })
+      
+      if (res.status !== 200) {
+        return
+      }
+      
+      setItemVisibility(invId, true)
+    } catch(error) {
+      console.error("Error removing skin from tradeup:", error)
+    }
   }
 
   return (
     <dialog id={`modal_${invId}`} className="modal">
       <div className="modal-box max-h-3xl">
         <h3 className="font-bold text-lg mb-2">Remove skin from Tradeup?</h3>
-        <button className="btn btn-error" onClick={onClick}>Remove skin</button>
+        <form method="dialog">
+          <button className="btn btn-error" onClick={onClick}>Remove skin</button>
+        </form>
       </div>
       <form method="dialog" className="modal-backdrop">
         <button>close</button>

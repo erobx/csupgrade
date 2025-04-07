@@ -10,7 +10,7 @@ export function WebSocketSubscriber() {
   useEffect(() => {
     if (!isConnected) return
 
-    unsubscribe(); // Unsubscribe before subscribing to new state
+    //unsubscribe(); // Unsubscribe before subscribing to new state
 
     const urlTradeupId = location.pathname.match(/\/tradeups\/([^\/]+)/)?.[1]
 

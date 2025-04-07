@@ -182,6 +182,23 @@ func (s *Server) addSkinToTradeup() fiber.Handler {
 
 		err := s.tradeupService.AddSkinToTradeup(tradeupID, invID, userID)
 		if err != nil {
+			log.Println(err)
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		return c.SendStatus(fiber.StatusOK)
+	}
+}
+
+func (s *Server) removeSkinFromTradeup() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		tradeupID := c.Params("tradeupId")
+		invID := c.Query("invId")
+		userID := GetUserIDFromClaims(c)
+
+		err := s.tradeupService.RemoveSkinFromTradeup(tradeupID, invID, userID)
+		if err != nil {
+			log.Println(err)
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 

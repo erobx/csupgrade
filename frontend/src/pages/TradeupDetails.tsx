@@ -23,7 +23,7 @@ function TradeupDetails() {
             <span className="font-bold">—</span>
             <span className="font-bold text-2xl text-info">{currentTradeup.status}</span>
           </div>
-          {currentTradeup.items.length === 10 && currentTradeup.status === 'Active' && (
+          {currentTradeup.items.length === 10 && currentTradeup.status !== 'Completed' && (
             <div className="font-bold text-lg">Tradeup Closes In: <CountdownTimer stopTime={currentTradeup.stopTime} /></div>
           )}
           <TradeupGrid

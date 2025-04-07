@@ -7,7 +7,7 @@ import { useNavigate } from "react-router"
 
 export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string, rarity: string }) {
   const { loggedIn } = useAuth()
-  const { inventory, removeItem } = useInventory()
+  const { inventory, setItemVisibility } = useInventory()
   const navigate = useNavigate()
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -25,7 +25,7 @@ export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string,
     const pages = Math.ceil(temp.length / itemsPerPage)
     setTotalPages(pages)
 
-    return inventory.items.filter(i => i.data.rarity === rarity)
+    return inventory.items.filter(i => i.data.rarity === rarity && i.visible === true)
   }, [inventory])
 
   const currentItems = filtered?.slice(startIndex, endIndex)
@@ -51,7 +51,7 @@ export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string,
                 invId={item.invId}
                 tradeupId={tradeupId}
                 skin={item.data}
-                removeItem={removeItem}
+                setItemVisibility={setItemVisibility}
               />
             ))
             ) : (
@@ -78,10 +78,10 @@ type ModalItemProps = {
   invId: string;
   tradeupId: string;
   skin: Skin;
-  removeItem: (invId: string) => void;
+  setItemVisibility: (invId: string, visible: boolean) => void;
 }
 
-function ModalItem({ invId, tradeupId, skin, removeItem }: ModalItemProps) {
+function ModalItem({ invId, tradeupId, skin, setItemVisibility }: ModalItemProps) {
   const { user } = useAuth()
 
   const addSkin = async () => {
@@ -89,17 +89,16 @@ function ModalItem({ invId, tradeupId, skin, removeItem }: ModalItemProps) {
     const jwt = localStorage.getItem("jwt")
     if (!user) return
     try {
-      const res = await fetch(`http://localhost:8080/v1/tradeups/${tradeupId}?invId=${invId}`, {
+      const res = await fetch(`http://localhost:8080/v1/tradeups/${tradeupId}/add?invId=${invId}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${jwt}`,
         },
       })
       if (res.status !== 200) {
         return
       }
-      removeItem(invId)
+      setItemVisibility(invId, false)
     } catch (error) {
       console.error("Error: ", error)
     }

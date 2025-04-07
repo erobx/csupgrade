@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @plugin "daisyui" {
     themes: dim --default, light --preferslight, retro, nord, synthwave, forest;
+    exclude: rootscrollgutter;
 }
 
 body, html {
