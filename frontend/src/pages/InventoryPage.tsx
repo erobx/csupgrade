@@ -1,4 +1,8 @@
+import RarityBadge from "../components/RarityBadge"
+import StatTrakBadge from "../components/StatTrakBadge"
+import { outlineMap } from "../constants/constants"
 import { useInventory } from "../providers/InventoryProvider"
+import { Skin } from "../types/skin"
 
 export default function InventoryPage() {
   const { inventory, removeItem } = useInventory()
@@ -15,13 +19,8 @@ export default function InventoryPage() {
             .filter((item) => item.visible) // Hide tradeup skins
             .map((item) => (
               <div key={item.invId} className="card bg-base-300">
-                {item.data? (
-                  <div className="card-body">
-                    <h3>{item.data.name}</h3>
-                    <p>Wear: {item.data.wear}</p>
-                    <p>Price: ${item.data.price.toFixed(2)}</p>
-                    <button className="btn btn-soft" onClick={() => removeItem(item.invId)}>Delete</button>
-                  </div>
+                {item.data ? (
+                  <InventoryItem skin={item.data} />
                 ) : (
                   <div className="loading-spinner loading-xl"></div>
                 )}
@@ -31,5 +30,36 @@ export default function InventoryPage() {
       </div>
     </div>
   )
+}
 
+function InventoryItem({ skin }: { skin: Skin }) {
+  const outlineColor = outlineMap[skin.rarity]
+
+  return (
+    <div
+      className={`card card-xs w-54 bg-base-200 shadow-md cursor-pointer hover:outline-4 ${outlineColor}`}
+    >
+      <h1 className="text-primary ml-1.5">${skin.price.toFixed(2)}</h1>
+      <figure>
+        <div>
+          <img
+            alt={skin.name}
+            src={skin.imgSrc}
+          />
+        </div>
+      </figure>
+      <div className="card-body items-center">
+        <h1 className="card-title text-xs">{skin.name}</h1>
+        <h2 className="card-title text-xs">({skin.wear})</h2>
+        <div className="flex gap-2">
+          <div>
+            <RarityBadge
+              rarity={skin.rarity}
+            />
+          </div>
+          {skin.isStatTrak && <StatTrakBadge />}
+        </div>
+      </div>
+    </div>
+  )
 }

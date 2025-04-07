@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"math/rand/v2"
+	"strings"
 
 	"github.com/erobx/tradeups-backend/pkg/api"
 	"github.com/google/uuid"
@@ -28,10 +29,11 @@ type Storage interface {
 
 type storage struct {
 	db *pgxpool.Pool
+	cdnUrl string
 }
 
-func NewStorage(db *pgxpool.Pool) Storage {
-	return &storage{db: db}
+func NewStorage(db *pgxpool.Pool, url string) Storage {
+	return &storage{db: db, cdnUrl: url}
 }
 
 func (s *storage) CreateUser(request *api.NewUserRequest) (string, error) {
@@ -108,6 +110,7 @@ func (s *storage) GetInventory(userID string) (api.Inventory, error) {
 			return inventory, err
 		}
 
+		skin.ImgSrc = s.createImgSrc(imageKey)
 		item.Data = skin
 		inventory.Items = append(inventory.Items, item)
 	}
@@ -219,11 +222,18 @@ func (s *storage) BuyCrate(crateID, userID string, amount int) (float64, []api.I
 			return updatedBalance, addedItems, err
 		}
 
-		// TODO: generate url for imageKey
 
+		skin.ImgSrc = s.createImgSrc(imageKey)
 		item.Data = skin
 		addedItems = append(addedItems, item)
 	}
 
 	return updatedBalance, addedItems, nil
+}
+
+// url + guns/ak/imageKey
+func (s *storage) createImgSrc(imageKey string) string {
+	prefix := imageKey[:strings.Index(imageKey, "-")]
+	url := s.cdnUrl + "guns/" + prefix + "/" + imageKey
+	return url
 }

@@ -30,7 +30,8 @@ func main() {
 	}
 	defer db.Close()
 
-	storage := repository.NewStorage(db)
+	cdnUrl := os.Getenv("CDN_URL")
+	storage := repository.NewStorage(db, cdnUrl)
 	userService := api.NewUserService(storage)
 	storeService := api.NewStoreService(storage)
 
