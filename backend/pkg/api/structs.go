@@ -37,9 +37,10 @@ type Item struct {
 type Tradeup struct {
     ID      	int     	`json:"id"`
     Rarity  	string  	`json:"rarity"`
-    Status  	string  	`json:"status"`
+    Status  	string  	`json:"status"` // Active, Waiting, Completed
 	Winner		string 		`json:"winner"`
 	StopTime 	time.Time 	`json:"stopTime"`
+	Mode		string		`json:"mode"` // Battle, Team, FFA
     Items   	[]Item  	`json:"items"`
 	Players 	[]User		`json:"players"`
 }

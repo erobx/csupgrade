@@ -11,9 +11,10 @@ interface TradeupRowProps {
   players: User[];
   rarity: string;
   items: InventoryItem[];
+  mode: string;
 }
 
-export default function TradeupRow({ id, players, rarity, items }: TradeupRowProps) {
+export default function TradeupRow({ id, players, rarity, items, mode }: TradeupRowProps) {
   const dividerColor: string = dividerMap[rarity]
 
   let skins: Skin[] = []
@@ -26,7 +27,7 @@ export default function TradeupRow({ id, players, rarity, items }: TradeupRowPro
   const totalPrice: number = skins.reduce((acc, curr) => acc + curr.price, 0)
 
   return (
-    <div className="join bg-base-300 border-6 border-base-200 items-center justify-evenly lg:w-3/4 rounded-md">
+    <div className="join bg-base-300 border-6 border-base-200 items-center lg:w-3/4 rounded-md">
       <div className="join-item">
         <InfoPanel 
           rarity={rarity} 
@@ -35,12 +36,12 @@ export default function TradeupRow({ id, players, rarity, items }: TradeupRowPro
       </div>
       <div className={`divider divider-horizontal ${dividerColor}`}></div>
 
-      <div className="join-item">
+      <div className="join-item w-5/8">
         <ImageCarousel skins={skins} />
       </div>
       <div className="divider divider-horizontal divider-info"></div>
 
-      <div className="join-item w-1/4">
+      <div className="join-item w-1/6">
         <DetailsPanel 
           total={totalPrice}
           players={players}
@@ -49,7 +50,7 @@ export default function TradeupRow({ id, players, rarity, items }: TradeupRowPro
       <div className="divider divider-horizontal divider-primary"></div>
 
       <div className="join-item">
-        <ButtonPanel tradeupId={id} />
+        <ButtonPanel tradeupId={id} mode={mode} />
       </div>
     </div>
   )
@@ -86,7 +87,7 @@ function DetailsPanel({ total, players }: { total: number, players: User[] }) {
       <div className="flex flex-col items-center gap-1.5">
         <h1 className="font-bold">Players</h1>
         <div className="font-bold">
-          {players.length !== 0 ? (
+          {players && players.length !== 0 ? (
             <AvatarGroup
               players={players}
             />
@@ -99,7 +100,7 @@ function DetailsPanel({ total, players }: { total: number, players: User[] }) {
   )
 }
 
-function ButtonPanel({ tradeupId }: { tradeupId: string }) {
+function ButtonPanel({ tradeupId, mode }: { tradeupId: string, mode: string }) {
   const navigate = useNavigate()
 
   const onJoin = () => {
@@ -108,8 +109,11 @@ function ButtonPanel({ tradeupId }: { tradeupId: string }) {
   }
 
   return (
-    <button className="btn btn-soft rounded-md btn-success w-30 mr-2" onClick={onJoin}>
-      Join
-    </button>
+    <div className="flex flex-col items-center gap-1">
+      <h1 className="font-bold mr-3">{mode}</h1>
+      <button className="btn btn-soft rounded-md btn-success w-30 mr-2" onClick={onJoin}>
+        Join
+      </button>
+    </div>
   )
 }

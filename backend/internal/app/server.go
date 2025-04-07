@@ -11,47 +11,19 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var (
-    s1 = api.Skin{
-        ID: 1,
-        Name: "AWP | Dragon Lore",
-        Rarity: "Covert",
-        Collection: "The Anal Collection",
-        Wear: "Factory New",
-        Float: 0.0521,
-        Price: 1321.42,
-        IsStatTrak: true,
-        WasWon: false,
-        ImgSrc: "",
-        CreatedAt: time.Now(),
-    }
-
-    s2 = api.Skin{
-        ID: 2,
-        Name: "AUG | Wings",
-        Rarity: "Industrial",
-        Collection: "The Booty Collection",
-        Wear: "Battle-Scarred",
-        Float: 0.9213,
-        Price: 0.10,
-        IsStatTrak: false,
-        WasWon: false,
-        ImgSrc: "",
-        CreatedAt: time.Now(),
-    }
-)
-
 type Server struct {
     sync.Mutex
+
     addr        	string
 	privateKey 		*rsa.PrivateKey
     app         	*fiber.App
 	validator 		Validator
+
 	userService 	api.UserService
 	storeService 	api.StoreService
 	tradeupService 	api.TradeupService
+
     clients     	map[string]*Client
-    tradeups    	map[string]*api.Tradeup // REPLACE WITH DB
 }
 
 func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.StoreService, ts api.TradeupService) *Server {
@@ -64,7 +36,6 @@ func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.
 		storeService: ss,
 		tradeupService: ts,
         clients: make(map[string]*Client),
-        tradeups: map[string]*api.Tradeup{},
     }
 
     s.UseMiddleware()
@@ -134,23 +105,6 @@ func (s *Server) handleSubscription(userID string, msg []byte) {
     }
 }
 
-//func (s *Server) addSkin(userId, tradeupId, skinId string) {
-//    s.Lock()
-//
-//    log.Println("Adding skin...")
-//    t, exists := s.tradeups[tradeupId]
-//    if !exists {
-//        t = &api.Tradeup{Id: tradeupId, Skins: make(map[string]string)}
-//        s.tradeups[tradeupId] = t
-//    }
-//
-//    t.Skins[userId] = skinId
-//
-//    s.Unlock()
-//
-//    s.broadcastState()
-//}
-
 func (s *Server) broadcastState() {
     s.Lock()
     defer s.Unlock()
@@ -172,4 +126,7 @@ func (s *Server) broadcastState() {
 			client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
         }
     }
+}
+
+func (s *Server) maintainTradeupCount() {
 }

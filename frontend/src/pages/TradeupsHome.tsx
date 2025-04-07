@@ -17,6 +17,7 @@ function TradeupsHome() {
             players={t.players}
             rarity={t.rarity}
             items={t.items}
+            mode={t.mode}
           />
         )
       ) : (

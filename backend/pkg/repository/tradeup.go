@@ -57,7 +57,7 @@ func (s *storage) GetTradeupByID(tradeupID string) (api.Tradeup, error) {
 	select * from tradeups where id=$1
 	`
 	err = s.db.QueryRow(context.Background(), q, tradeupID).Scan(&tradeup.ID,
-		&tradeup.Rarity, &tradeup.Status, &winner, &tradeup.StopTime)
+		&tradeup.Rarity, &tradeup.Status, &winner, &tradeup.StopTime, &tradeup.Mode)
 	if err != nil {
 		tx.Rollback(context.Background())
 		return tradeup, err
@@ -190,13 +190,14 @@ func (s *storage) RemoveSkinFromTradeup(tradeupID, invID string) error {
 }
 
 func (s *storage) StartTimer(tradeupID string) error {
-	q := "update tradeups set stop_time = now() + interval '4 hour 5 min' where id=$1"
+	// UTC timestamp is off by 4 hours currently for me
+	q := "update tradeups set stop_time=now()+interval '4 hour 5 min',current_status='Waiting' where id=$1"
 	_, err := s.db.Exec(context.Background(), q, tradeupID)
 	return err
 }
 
 func (s *storage) StopTimer(tradeupID string) error {
-	q := "update tradeups set stop_time = now() + interval '5 year' where id=$1"
+	q := "update tradeups set stop_time=now()+interval '5 year',current_status='Active' where id=$1"
 	_, err := s.db.Exec(context.Background(), q, tradeupID)
 	return err
 }

@@ -1,8 +1,8 @@
 import { useRef, useState, useCallback, useEffect } from "react"
 import { Skin } from "../types/skin"
 
-const imgWidth = 150
-const imgHeight = 150
+const imgWidth = 125
+const imgHeight = 125
 
 // Should take in array of imgSrcs from the skins
 export default function ImageCarousel({ skins }: { skins: Skin[] }) {

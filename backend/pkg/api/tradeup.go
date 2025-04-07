@@ -1,6 +1,9 @@
 package api
 
-import "errors"
+import (
+	"errors"
+	"log"
+)
 
 type TradeupService interface {
 	GetAllTradeups() ([]Tradeup, error)
@@ -74,11 +77,7 @@ func (ts *tradeupService) AddSkinToTradeup(tradeupID, invID, userID string) erro
 		if err != nil {
 			return err
 		}
-
-		err = ts.storage.SetStatus(tradeupID, "Waiting")
-		if err != nil {
-			return err
-		}
+		log.Printf("Started timer for %s\n", tradeupID)
 	}
 
 	return nil
@@ -94,28 +93,24 @@ func (ts *tradeupService) RemoveSkinFromTradeup(tradeupID, invID, userID string)
 		return errors.New("user does not own requested item")
 	}
 
-	// full before removal and status is waiting, stop timer
-	isFull, err := ts.storage.IsTradeupFull(tradeupID)
-	if err != nil {
-		return err
-	}
-
 	status, err := ts.storage.GetStatus(tradeupID)
 	if err != nil {
 		return err
 	}
 
-	if isFull && status == "Waiting" {
+	if status == "Waiting" {
 		err := ts.storage.StopTimer(tradeupID)
 		if err != nil {
 			return err
 		}
-
-		err = ts.storage.SetStatus(tradeupID, "Active")
-		if err != nil {
-			return err
-		}
+		log.Printf("Stopped timer for %s\n", tradeupID)
 	}
 
 	return ts.storage.RemoveSkinFromTradeup(tradeupID, invID)
+}
+
+// Get tradeups with status waiting that have an expired stop time.
+// Decide winner and give winner new skin.
+func (ts *tradeupService) ProcessWinner() {
+
 }
