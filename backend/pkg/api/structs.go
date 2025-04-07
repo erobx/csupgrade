@@ -41,6 +41,7 @@ type Tradeup struct {
 	Winner		string 		`json:"winner"`
 	StopTime 	time.Time 	`json:"stopTime"`
     Items   	[]Item  	`json:"items"`
+	Players 	[]User		`json:"players"`
 }
 
 type Skin struct {

@@ -1,4 +1,5 @@
 import { InventoryItem } from "./inventory";
+import { User } from "./user";
 
 export type Tradeup = {
   id: string;
@@ -7,9 +8,5 @@ export type Tradeup = {
   items: InventoryItem[];
   status: string;
   stopTime: Date;
-}
-
-export type Player = {
-  username: string;
-  avatar: string;
+  players: User[];
 }

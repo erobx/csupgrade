@@ -1,6 +1,6 @@
-import { Player } from "../types/tradeup"
+import { User } from "../types/user"
 
-export default function AvatarGroup({ players }: { players: Player[] }) {
+export default function AvatarGroup({ players }: { players: User[] }) {
   return (
     <div className="avatar-group gap-1">
       {players.map((p) => (

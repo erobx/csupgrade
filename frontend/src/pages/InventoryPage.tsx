@@ -7,10 +7,13 @@ import { Skin } from "../types/skin"
 export default function InventoryPage() {
   const { inventory, removeItem } = useInventory()
 
+  const handleFilter = () => {
+  }
+
   if (!inventory) return <div className="loading-spinner loading-md"></div>
 
   return (
-    <div className="flex flex-col items-center mt-2 gap-2">
+    <div className="flex gap-6">
       <div className="grid grid-cols-6 gap-2">
         {inventory.items.length === 0 ? (
           <h1 className="text-xl font-bold text-info">Visit the Store for more skins!</h1>
@@ -28,6 +31,20 @@ export default function InventoryPage() {
             ))
           )}
       </div>
+
+      <div className="card flex flex-col items-center text-center gap-3 bg-base-200 p-4 h-fit w-fit lg:w-[14vw]">
+        <h1 className="font-bold text-lg">Settings</h1>
+        <form className="filter" onClick={handleFilter}>
+          <input className="btn btn-soft btn-square" type="reset" value="×"/>
+          <input className="btn btn-soft btn-info" type="radio" name="frameworks" aria-label="Rarity"/>
+          <input className="btn btn-soft btn-accent" type="radio" name="frameworks" aria-label="Wear"/>
+          <input className="btn btn-soft btn-warning" type="radio" name="frameworks" aria-label="Price"/>
+        </form>
+        <div className="w-full">
+          <button className="btn btn-soft btn-error w-full">Enter delete mode</button>
+        </div>
+      </div>
+
     </div>
   )
 }

@@ -70,12 +70,15 @@ func (s *storage) GetTradeupByID(tradeupID string) (api.Tradeup, error) {
 	}
 
 	items := make([]api.Item, 0)
+	players := make(map[string]api.User, 0)
 	q = `
-	select i.id, i.skin_id, i.wear_str, i.wear_num, i.price, i.is_stattrak, 
-		i.created_at, s.name, s.rarity, s.collection, s.image_key
+	select i.id, i.user_id, i.skin_id, i.wear_str, i.wear_num, i.price, i.is_stattrak, 
+		i.created_at, u.username, u.email, u.balance, u.avatar_key, s.name, s.rarity, 
+		s.collection, s.image_key
 	from tradeups t
 	join tradeups_skins ts on ts.tradeup_id = t.id
 	join inventory i on i.id = ts.inv_id
+	join users u on u.id = i.user_id
 	join skins s on s.id = i.skin_id
 	where t.id=$1
 	`
@@ -89,19 +92,30 @@ func (s *storage) GetTradeupByID(tradeupID string) (api.Tradeup, error) {
 	for rows.Next() {
 		var item api.Item
 		var skin api.Skin
+		var player api.User
+		var avatarKey string
 		var imageKey string
 
-		err := rows.Scan(&item.InvID, &skin.ID, &skin.Wear, &skin.Float, &skin.Price,
-						&skin.IsStatTrak, &skin.CreatedAt, &skin.Name, &skin.Rarity,
-						&skin.Collection, &imageKey)
+		err := rows.Scan(&item.InvID, &player.ID, &skin.ID, &skin.Wear, &skin.Float, &skin.Price,
+						&skin.IsStatTrak, &skin.CreatedAt, &player.Username, &player.Email, 
+						&player.Balance, &avatarKey, &skin.Name, &skin.Rarity, &skin.Collection, &imageKey)
 		if err != nil {
 			tx.Rollback(context.Background())
 			return tradeup, err
 		}
 
+		if _, ok := players[player.ID]; !ok {
+			player.AvatarSrc = avatarKey
+			players[player.ID] = player
+		}
+
 		skin.ImgSrc = s.createImgSrc(imageKey)
 		item.Data = skin
 		items = append(items, item)
+	}
+
+	for _, p := range players {
+		tradeup.Players = append(tradeup.Players, p)
 	}
 
 	tradeup.Items = items

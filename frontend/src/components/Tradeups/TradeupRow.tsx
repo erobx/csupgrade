@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router";
 import { InventoryItem } from "../../types/inventory"
 import { Skin } from "../../types/skin";
-import { Player } from "../../types/tradeup";
 import ImageCarousel from "../ImageCarousel";
 import AvatarGroup from "../AvatarGroup";
 import { dividerMap } from "../../constants/constants";
+import { User } from "../../types/user";
 
 interface TradeupRowProps {
   id: string;
-  players: Player[];
+  players: User[];
   rarity: string;
   items: InventoryItem[];
 }
@@ -76,7 +76,7 @@ function InfoPanel({ rarity, count }: { rarity: string, count: number }) {
   )
 }
 
-function DetailsPanel({ total, players }: { total: number, players: Player[] }) {
+function DetailsPanel({ total, players }: { total: number, players: User[] }) {
   return (
     <div className="flex justify-evenly">
       <div className="flex flex-col items-center gap-1.5">

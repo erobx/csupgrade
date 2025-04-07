@@ -4,7 +4,6 @@ import TradeupRow from "../components/Tradeups/TradeupRow"
 
 function TradeupsHome() {
   const { tradeups } = useWS()
-  const players: any[] = []
 
   return (
     <div className="flex flex-col items-center gap-2 mt-3">
@@ -15,10 +14,9 @@ function TradeupsHome() {
         tradeups.map((t: Tradeup) =>
           <TradeupRow
             id={t.id}
-            players={players}
+            players={t.players}
             rarity={t.rarity}
             items={t.items}
-            status={"Active"}
           />
         )
       ) : (
