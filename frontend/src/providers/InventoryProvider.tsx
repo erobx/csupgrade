@@ -5,7 +5,9 @@ interface InventoryContextType {
   inventory: Inventory | null;
   addItem: (item: InventoryItem) => void;
   removeItem: (invId: string) => void;
+  ownsItem: (invId: string) => boolean;
   setItemVisibility: (invId: string, visible: boolean) => void;
+  setInventory: React.Dispatch<React.SetStateAction<Inventory | null>>;
 }
 
 const InventoryContext = createContext<InventoryContextType | null>(null)
@@ -49,6 +51,10 @@ export function InventoryProvider({ children, userId }: InventoryProviderProps) 
     )
   }
 
+  function ownsItem(invId: string) {
+    return inventory?.items.some((item) => item.invId === invId) ?? false
+  }
+
   function setItemVisibility(invId: string, visible: boolean) {
     setInventory((prev) =>
       prev
@@ -61,7 +67,7 @@ export function InventoryProvider({ children, userId }: InventoryProviderProps) 
   }
 
   return (
-    <InventoryContext.Provider value={{ inventory, addItem, removeItem, setItemVisibility }}>
+    <InventoryContext.Provider value={{ inventory, addItem, removeItem, ownsItem, setItemVisibility, setInventory }}>
       {children}
     </InventoryContext.Provider>
   )

@@ -13,7 +13,7 @@ import (
 // Responsible for every user interaction, new, remove, updates
 type UserService interface {
 	New(user *NewUserRequest) (string, error)
-	Login(request NewLoginRequest) (User, error)
+	Login(request *NewLoginRequest) (User, Inventory, error)
 	GetUser(userID string) (User, error)
 	GetInventory(userID string) (Inventory, error)
 	GetRecentTradeups(userID string) ([]Tradeup, error)
@@ -55,27 +55,33 @@ func (u *userService) New(user *NewUserRequest) (string, error) {
 	return u.storage.CreateUser(user)
 }
 
-// Logs in an existing user
-func (u *userService) Login(request NewLoginRequest) (User, error) {
+// Logs in an existing user, gets their data and inventory
+func (u *userService) Login(request *NewLoginRequest) (User, Inventory, error) {
 	var user User
+	var inv Inventory
 	err := ValidateLoginRequest(request)
 	if err != nil {
-		return user, err
+		return user, inv, err
 	}
 
 	request.Email = strings.TrimSpace(request.Email)
 
 	user, hash, err := u.storage.GetUserAndHashByEmail(request.Email)
 	if err != nil {
-		return user, err
+		return user, inv, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(request.Password))
 	if err != nil {
-		return user, err
+		return user, inv, err
 	}
 
-	return user, nil
+	inv, err = u.storage.GetInventory(user.ID)
+	if err != nil {
+		return user, inv, err
+	}
+
+	return user, inv, nil
 }
 
 func (u *userService) GetUser(userID string) (User, error) {
@@ -115,7 +121,7 @@ func ValidateNewUserRequest(user *NewUserRequest) error {
 	return nil
 }
 
-func ValidateLoginRequest(user NewLoginRequest) error {
+func ValidateLoginRequest(user *NewLoginRequest) error {
 	if user.Email == "" {
 		return errors.New("email cannot be empty")
 	}

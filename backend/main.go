@@ -30,17 +30,18 @@ func main() {
 	}
 	defer db.Close()
 
-	cdnUrl := os.Getenv("CDN_URL")
+	cdnUrl := os.Getenv("SKINS_CDN_URL")
 	storage := repository.NewStorage(db, cdnUrl)
 	userService := api.NewUserService(storage)
 	storeService := api.NewStoreService(storage)
+	tradeupService := api.NewTradeupService(storage)
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(os.Getenv("RSA_PRIVATE_KEY")))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	server := app.NewServer("8080", privateKey, userService, storeService)
+	server := app.NewServer("8080", privateKey, userService, storeService, tradeupService)
 	server.Run()
 }
 

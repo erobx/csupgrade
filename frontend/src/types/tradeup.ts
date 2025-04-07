@@ -6,6 +6,7 @@ export type Tradeup = {
   locked: boolean;
   items: InventoryItem[];
   status: string;
+  stopTime: Date;
 }
 
 export type Player = {

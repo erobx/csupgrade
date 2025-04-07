@@ -49,11 +49,12 @@ type Server struct {
 	validator 		Validator
 	userService 	api.UserService
 	storeService 	api.StoreService
+	tradeupService 	api.TradeupService
     clients     	map[string]*Client
     tradeups    	map[string]*api.Tradeup // REPLACE WITH DB
 }
 
-func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.StoreService) *Server {
+func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.StoreService, ts api.TradeupService) *Server {
     s := &Server{
         addr: addr,
         app: fiber.New(),
@@ -61,44 +62,10 @@ func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.
 		privateKey: privKey,
 		userService: us,
 		storeService: ss,
+		tradeupService: ts,
         clients: make(map[string]*Client),
         tradeups: map[string]*api.Tradeup{},
     }
-
-    t1 := &api.Tradeup{
-        ID: 1,
-        Rarity: "Consumer",
-        Items: make([]api.Item, 0),
-        Locked: false,
-        Status: "Active",
-    }
-    
-    t2 := &api.Tradeup{
-        ID: 2,
-        Rarity: "Consumer",
-        Items: make([]api.Item, 0),
-        Locked: false,
-        Status: "Active",
-    }
-
-    item1 := api.Item{
-        InvID: 1,
-        Data: s1,
-        Visible: true,
-    }
-
-    item2 := api.Item{
-        InvID: 5,
-        Data: s2,
-        Visible: true,
-    }
-
-    t1.Items = append(t1.Items, item1)
-    t1.Items = append(t1.Items, item2)
-    t2.Items = append(t2.Items, item2)
-
-    s.tradeups["1"] = t1
-    s.tradeups["2"] = t2
 
     s.UseMiddleware()
     s.Routes()
@@ -145,19 +112,21 @@ func (s *Server) handleSubscription(userID string, msg []byte) {
     case "subscribe_all":
         client.SubscribedAll = true
         client.SubscribedID = ""
-        temp := []api.Tradeup{}
-        for _, t := range s.tradeups {
-            temp = append(temp, *t)
-        }
-        log.Println("Sending tradeups:", temp)
-        client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": temp})
+		tradeups, err := s.tradeupService.GetAllTradeups()
+		if err != nil {
+			log.Printf("Error getting tradeups - %v\n", err)
+			return
+		}
+        client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": tradeups})
     case "subscribe_one":
         client.SubscribedAll = false
         client.SubscribedID = payload.TradeupID
-        t, exists := s.tradeups[payload.TradeupID]
-        if exists {
-            client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
-        }
+		t, err := s.tradeupService.GetTradeupByID(payload.TradeupID)
+		if err != nil {
+			log.Printf("Error getting tradeup %s - %v\n", payload.TradeupID, err)
+			return
+		}
+		client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
     case "unsubscribe":
         client.SubscribedAll = false
         client.SubscribedID = ""
@@ -188,11 +157,17 @@ func (s *Server) broadcastState() {
 
     for _, client := range s.clients {
         if client.SubscribedAll {
-            client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": s.tradeups})
+			tradeups, err := s.tradeupService.GetAllTradeups()
+			if err != nil {
+				return
+			}
+            client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": tradeups})
         } else if client.SubscribedID != "" {
-            if t, exists := s.tradeups[client.SubscribedID]; exists {
-                client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
-            }
+			t, err := s.tradeupService.GetTradeupByID(client.SubscribedID)
+			if err != nil {
+				return 
+			}
+			client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
         }
     }
 }

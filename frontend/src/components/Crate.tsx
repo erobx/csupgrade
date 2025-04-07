@@ -6,7 +6,7 @@ type CrateProps = {
   crateId: string;
   name: string;
   amount: number;
-  setErrorMessage: (msg: string) => void;
+  setToastMessage: (msg: string) => void;
 }
 
 type Response = {
@@ -14,7 +14,7 @@ type Response = {
   items: InventoryItem[];
 }
 
-export default function Crate({ crateId, name, amount, setErrorMessage }: CrateProps) {
+export default function Crate({ crateId, name, amount, setToastMessage }: CrateProps) {
   const { user, setBalance } = useAuth()
   const { addItem } = useInventory()
 
@@ -31,7 +31,7 @@ export default function Crate({ crateId, name, amount, setErrorMessage }: CrateP
         })
 
         if (res.status === 500) {
-          setErrorMessage("Insufficient funds")
+          setToastMessage("Insufficient funds")
           return
         }
 

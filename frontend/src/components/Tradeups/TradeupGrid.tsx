@@ -1,5 +1,7 @@
+import { useInventory } from "../../providers/InventoryProvider";
 import { InventoryItem } from "../../types/inventory";
 import { Skin } from "../../types/skin";
+import StatTrakBadge from "../StatTrakBadge";
 import TradeupModal from "./TradeupModal"
 
 type TradeupGridProps = {
@@ -10,12 +12,15 @@ type TradeupGridProps = {
 }
 
 export default function TradeupGrid({ tradeupId, rarity, items, status}: TradeupGridProps) {
+  const { ownsItem } = useInventory()
+
   const skins: Skin[] = items.filter(item => 
     item.data && typeof item.data === 'object' && 'id' in item.data &&
       'name' in item.data && 'rarity' in item.data)
     .map(item => item.data as Skin)
 
   const invIds: string[] = items.map(item => item.invId)
+  const owernship: boolean[] = items.map(item => ownsItem(item.invId))
 
   return (
     <div className="grid grid-cols-5 grid-rows-2 rounded mt-5 gap-2">
@@ -28,7 +33,7 @@ export default function TradeupGrid({ tradeupId, rarity, items, status}: Tradeup
           price={skin.price.toFixed(2)}
           isStatTrak={skin.isStatTrak}
           imgSrc={skin.imgSrc}
-          owned={true}
+          owned={owernship[index]}
           status={status}
         />
       ))}
@@ -77,18 +82,17 @@ function GridItem({ invId, tradeupId, name, wear, price, isStatTrak, imgSrc, own
       )}
       <figure>
         <div>
-          {/*<img
+          <img
             alt={name}
             src={imgSrc}
           />
-          */}
         </div>
       </figure>
       <div className="card-body items-center">
         <h1 className="card-title text-sm">{name}</h1>
         <h1 className="card-title text-sm">({wear})</h1>
         <div className="flex gap-2">
-          {/*isStatTrak && <StatTrakBadge />*/}
+          {isStatTrak && <StatTrakBadge />}
         </div>
       </div>
       <Modal invId={invId} tradeupId={tradeupId} />
@@ -105,7 +109,7 @@ function Modal({ invId, tradeupId }: { invId: string, tradeupId: string }) {
     //} else {
     //  return
     //}
-    console.log(`Removed skin ${invId} from tradeup ${tradeupId}`)
+    //console.log(`Removed skin ${invId} from tradeup ${tradeupId}`)
 
     // add item back to inventory
     //addItem()

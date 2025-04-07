@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"log"
 	"strconv"
 	"time"
@@ -56,14 +55,14 @@ func (s *Server) register() fiber.Handler {
 
 func (s *Server) login() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var newLoginRequest api.NewLoginRequest
-		
-		err := json.Unmarshal(c.Body(), newLoginRequest)
-		if err != nil {
-			return err
-		}
+		newLoginRequest := new(api.NewLoginRequest)
 
-		user, err := s.userService.Login(newLoginRequest)
+		if err := c.BodyParser(newLoginRequest); err != nil {
+			log.Println(err)
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
+		
+		user, inv, err := s.userService.Login(newLoginRequest)
 		if err != nil {
 			log.Println(err)
 			return c.SendStatus(fiber.StatusUnauthorized)
@@ -84,6 +83,7 @@ func (s *Server) login() fiber.Handler {
 
 		return c.JSON(fiber.Map{
 			"user": user,
+			"inventory": inv,
 			"jwt": t,
 		})
 	}
@@ -174,13 +174,28 @@ func (s *Server) buyCrate() fiber.Handler {
 	}
 }
 
+func (s *Server) addSkinToTradeup() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		tradeupID := c.Params("tradeupId")
+		invID := c.Query("invId")
+		userID := GetUserIDFromClaims(c)
+
+		err := s.tradeupService.AddSkinToTradeup(tradeupID, invID, userID)
+		if err != nil {
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		return c.SendStatus(fiber.StatusOK)
+	}
+}
+
 func (s *Server) handleWebSocket(c *websocket.Conn) {
     log.Printf("New connection\n")
     userID := c.Query("userId")
 
     sessionID := ""
     if userID == "" {
-        sessionID = "test"
+        sessionID = "anon"
         userID = sessionID
     }
 

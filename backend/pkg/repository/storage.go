@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"log"
 	"math/rand/v2"
@@ -25,6 +26,14 @@ type Storage interface {
 
 	// Store
 	BuyCrate(crateID, userID string, amount int) (float64, []api.Item, error)
+	
+	// Tradeups
+	GetAllTradeups() ([]api.Tradeup, error)
+	GetTradeupByID(tradeupID string) (api.Tradeup, error)
+	CheckSkinOwnership(invID, userID string) (bool, error)
+	IsTradeupFull(tradeupID string) (bool, error)
+	AddSkinToTradeup(tradeupID, invID string) error
+	StartTimer(tradeupID string) error
 }
 
 type storage struct {
@@ -222,13 +231,177 @@ func (s *storage) BuyCrate(crateID, userID string, amount int) (float64, []api.I
 			return updatedBalance, addedItems, err
 		}
 
-
 		skin.ImgSrc = s.createImgSrc(imageKey)
 		item.Data = skin
 		addedItems = append(addedItems, item)
 	}
 
 	return updatedBalance, addedItems, nil
+}
+
+/*
+Functions for TradeupService
+*/
+
+func (s *storage) GetAllTradeups() ([]api.Tradeup, error) {
+	var tradeups []api.Tradeup
+	var ids []string
+
+	q := `select id from tradeups where current_status = 'Active'`
+	rows, err := s.db.Query(context.Background(), q)
+	if err != nil {
+		return tradeups, nil
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id string
+		err := rows.Scan(&id)
+		if err != nil {
+			return tradeups, err
+		}
+		
+		ids = append(ids, id)
+	}
+
+	for _, id := range ids {
+		t, err := s.GetTradeupByID(id)
+		if err != nil {
+			return tradeups, err
+		}
+
+		tradeups = append(tradeups, t)
+	}
+
+	return tradeups, nil
+}
+
+func (s *storage) GetTradeupByID(tradeupID string) (api.Tradeup, error) {
+	var tradeup api.Tradeup
+
+	tx, err := s.db.BeginTx(context.Background(), pgx.TxOptions{})
+	if err != nil {
+		return tradeup, err
+	}
+	defer func() {
+		tx.Commit(context.Background())
+	}()
+
+	var winner sql.NullString
+
+	q := `
+	select * from tradeups where id=$1
+	`
+	err = s.db.QueryRow(context.Background(), q, tradeupID).Scan(&tradeup.ID,
+		&tradeup.Rarity, &tradeup.Status, &winner, &tradeup.StopTime)
+	if err != nil {
+		tx.Rollback(context.Background())
+		return tradeup, err
+	}
+
+	if winner.Valid {
+		tradeup.Winner = winner.String
+	} else {
+		tradeup.Winner = ""
+	}
+
+	items := make([]api.Item, 0)
+	q = `
+	select i.id, i.skin_id, i.wear_str, i.wear_num, i.price, i.is_stattrak, 
+		i.created_at, s.name, s.rarity, s.collection, s.image_key
+	from tradeups t
+	join tradeups_skins ts on ts.tradeup_id = t.id
+	join inventory i on i.id = ts.inv_id
+	join skins s on s.id = i.skin_id
+	where t.id=$1
+	`
+	rows, err := s.db.Query(context.Background(), q, tradeupID)
+	if err != nil {
+		tx.Rollback(context.Background())
+		return tradeup, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item api.Item
+		var skin api.Skin
+		var imageKey string
+
+		err := rows.Scan(&item.InvID, &skin.ID, &skin.Wear, &skin.Float, &skin.Price,
+						&skin.IsStatTrak, &skin.CreatedAt, &skin.Name, &skin.Rarity,
+						&skin.Collection, &imageKey)
+		if err != nil {
+			tx.Rollback(context.Background())
+			return tradeup, err
+		}
+
+		skin.ImgSrc = s.createImgSrc(imageKey)
+		item.Data = skin
+		items = append(items, item)
+	}
+
+	tradeup.Items = items
+	return tradeup, nil
+}
+
+func (s *storage) CheckSkinOwnership(invID, userID string) (bool, error) {
+	isOwned := false
+
+	q := "select exists(select 1 from inventory where id=$1 and user_id=$2)"
+	err := s.db.QueryRow(context.Background(), q, invID, userID).Scan(&isOwned)
+
+	return isOwned, err
+}
+
+func (s *storage) IsTradeupFull(tradeupID string) (bool, error) {
+	var count int
+	q := "select count(*) from tradeups_skins where tradeup_id=$1"
+	err := s.db.QueryRow(context.Background(), q, tradeupID).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+
+	if count == 10 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func (s *storage) AddSkinToTradeup(tradeupID, invID string) error {
+	tx, err := s.db.BeginTx(context.Background(), pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
+	defer func() {
+		tx.Commit(context.Background())
+	}()
+
+	q := "insert into tradeups_skins values($1,$2)"
+	_, err = tx.Exec(context.Background(), q, tradeupID, invID)
+	if err != nil {
+		tx.Rollback(context.Background())
+		return err
+	}
+
+	q = "update inventory set visible=false where id=$1"
+	_, err = tx.Exec(context.Background(), q, invID)
+	if err != nil {
+		tx.Rollback(context.Background())
+		return err
+	}
+
+	return nil
+}
+
+func (s *storage) StartTimer(tradeupID string) error {
+	q := "update tradeups set stop_time = now() + interval '5 min' where id=$1"
+	_, err := s.db.Exec(context.Background(), q, tradeupID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // url + guns/ak/imageKey

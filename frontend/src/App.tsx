@@ -74,7 +74,7 @@ export default function App() {
     fetchUser()
   },[])
 
-  if (loading || !userID) {
+  if (loading) {
     return (
       <div className='loading-spinner loading-xs'></div>
     )

@@ -11,7 +11,7 @@ export default function InventoryPage() {
 
   return (
     <div className="flex flex-col items-center mt-2 gap-2">
-      <div className="flex gap-2">
+      <div className="grid grid-cols-6 gap-2">
         {inventory.items.length === 0 ? (
           <h1 className="text-xl font-bold text-info">Visit the Store for more skins!</h1>
         ) : (

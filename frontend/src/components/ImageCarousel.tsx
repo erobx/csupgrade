@@ -32,19 +32,17 @@ export default function ImageCarousel({ skins }: { skins: Skin[] }) {
   }, [activeItem])
 
   return (
-    <div ref={carouselRef} className="carousel carousel-center rounded-box w-1/2">
+    <div ref={carouselRef} className="carousel carousel-center rounded-box">
       {
         skins.map((skin, index) => (
           <div key={index} className="carousel-item">
             <div>
-              {/*
               <img
                 width={imgWidth}
                 height={imgHeight}
                 src={skin.imgSrc}
                 alt={skin.imgSrc}
               />
-              */}
             </div>
           </div>
         ))

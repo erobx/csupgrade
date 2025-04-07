@@ -35,11 +35,12 @@ type Item struct {
 }
 
 type Tradeup struct {
-    ID      int     `json:"id"`
-    Rarity  string  `json:"rarity"`
-    Items   []Item  `json:"items"`
-    Locked  bool    `json:"locked"`
-    Status  string  `json:"status"`
+    ID      	int     	`json:"id"`
+    Rarity  	string  	`json:"rarity"`
+    Status  	string  	`json:"status"`
+	Winner		string 		`json:"winner"`
+	StopTime 	time.Time 	`json:"stopTime"`
+    Items   	[]Item  	`json:"items"`
 }
 
 type Skin struct {

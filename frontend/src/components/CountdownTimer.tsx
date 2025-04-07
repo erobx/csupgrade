@@ -10,16 +10,15 @@
 
 import { useState, useEffect } from 'react';
 
-export default function CountdownTimer({ stopTime }: { stopTime: string }) {
+export default function CountdownTimer({ stopTime }: { stopTime: Date }) {
   const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining());
 
   function calculateTimeRemaining() {
     // Parse the stopTime (assuming it's a valid ISO date string)
-    const stopDate: Date = new Date(stopTime);
     const now: Date = new Date();
     
     // Calculate the difference
-    const difference = stopDate - now;
+    const difference = stopTime - now;
     
     // If time has passed, return all zeros
     if (difference <= 0) {

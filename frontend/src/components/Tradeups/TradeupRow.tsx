@@ -11,16 +11,19 @@ interface TradeupRowProps {
   players: Player[];
   rarity: string;
   items: InventoryItem[];
-  status: string;
 }
 
-export default function TradeupRow({ id, players, rarity, items, status }: TradeupRowProps) {
+export default function TradeupRow({ id, players, rarity, items }: TradeupRowProps) {
   const dividerColor: string = dividerMap[rarity]
-  const totalPrice: number = 0
 
-  const skins: Skin[] = items.filter(item =>
-    item.data && typeof item.data === 'object' && 'id' in item.data &&
-    'name' in item.data && 'rarity' in item.data).map(item => item.data as Skin)
+  let skins: Skin[] = []
+  if (items.length > 0) {
+    skins = items.filter(item =>
+      item.data && typeof item.data === 'object' && 'id' in item.data &&
+      'name' in item.data && 'rarity' in item.data).map(item => item.data as Skin)
+  }
+
+  const totalPrice: number = skins.reduce((acc, curr) => acc + curr.price, 0)
 
   return (
     <div className="join bg-base-300 border-6 border-base-200 items-center justify-evenly lg:w-3/4 rounded-md">
@@ -37,13 +40,11 @@ export default function TradeupRow({ id, players, rarity, items, status }: Trade
       </div>
       <div className="divider divider-horizontal divider-info"></div>
 
-      <div className="flex items-start">
-        <div className="join-item">
-          <DetailsPanel  total={totalPrice} />
-        </div>
-        <div className="join-item">
-          <PlayersPanel players={players} />
-        </div>
+      <div className="join-item w-1/4">
+        <DetailsPanel 
+          total={totalPrice}
+          players={players}
+        />
       </div>
       <div className="divider divider-horizontal divider-primary"></div>
 
@@ -75,40 +76,23 @@ function InfoPanel({ rarity, count }: { rarity: string, count: number }) {
   )
 }
 
-function DetailsPanel({ total }: { total: number }) {
+function DetailsPanel({ total, players }: { total: number, players: Player[] }) {
   return (
-    <div className="card card-sm">
-      <div className="card-body justify-center">
-        <div className="flex flex-col items-center gap-1.5">
-          <div className="card-title">
-            Pool Value
-          </div>
-          <div className="card-title">
-            ${total}
-          </div>
-        </div>
+    <div className="flex justify-evenly">
+      <div className="flex flex-col items-center gap-1.5">
+        <h1 className="font-bold">Pool Value</h1>
+        <h2 className="font-bold">${total.toFixed(2)}</h2>
       </div>
-    </div>
-  )
-}
-
-function PlayersPanel({ players }: { players: Player[] }) {
-  return (
-    <div className="card card-sm">
-      <div className="card-body justify-center">
-        <div className="flex flex-col gap-1.5 items-center">
-          <div className="card-title">
-            Players
-          </div>
-          <div className="card-title">
-            {players.length !== 0 ? (
-              <AvatarGroup
-                players={players}
-              />
-            ) : (
-              <div>None</div>
-            )}
-          </div>
+      <div className="flex flex-col items-center gap-1.5">
+        <h1 className="font-bold">Players</h1>
+        <div className="font-bold">
+          {players.length !== 0 ? (
+            <AvatarGroup
+              players={players}
+            />
+          ) : (
+            <h1 className="font-bold">None</h1>
+          )}
         </div>
       </div>
     </div>

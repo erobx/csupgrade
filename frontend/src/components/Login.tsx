@@ -1,36 +1,46 @@
 import { useNavigate } from "react-router"
 import useAuth from "../stores/authStore"
 import { useState } from "react"
+import { useInventory } from "../providers/InventoryProvider"
+import { Inventory } from "../types/inventory"
+import { User } from "../types/user"
 
 const baseUrl = "http://localhost:8080/auth"
 
-export const submitLogin = async (email: string, password: string) => {
-    const creds = {
-        email: email,
-        password: password,
-    }
-
-    const opts = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(creds)
-    }
-
-    try {
-        const res = await fetch(baseUrl+"/login", opts)
-        const data = await res.json()
-        return data
-    } catch (error) {
-        console.error('Error:', error)
-    }
+type Response = {
+  user: User;
+  inventory: Inventory;
+  jwt: string;
 }
 
+export const submitLogin = async (email: string, password: string): Promise<Response | void> => {
+  const creds = {
+      email: email,
+      password: password,
+  }
+
+  const opts = {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(creds)
+  }
+
+  try {
+      const res = await fetch(baseUrl+"/login", opts)
+      const data: Promise<Response> = await res.json()
+      return data
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
 
 export default function Login() {
   const navigate = useNavigate()
-  const { loggedIn, setLoggedIn } = useAuth()
+  const { setUser, setLoggedIn } = useAuth()
+  const { setInventory } = useInventory()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -44,7 +54,10 @@ export default function Login() {
       const data = await submitLogin(email, password)
       if (data) {
         setLoggedIn(true)
-        localStorage.setItem("jwt", data.JWT)
+        setUser(data.user)
+        setInventory(data.inventory)
+
+        localStorage.setItem("jwt", data.jwt)
         navigate("/dashboard")
         resetForm()
       } else {

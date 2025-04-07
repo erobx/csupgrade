@@ -23,6 +23,11 @@ func (s *Server) ProtectedRoutes() {
 	users.Get("/:userId/recents", s.getRecentTradeups())
 	users.Get("/:userId/stats", s.getUserStats())
 
+	// v1/store/*
 	store := v1.Group("store")
 	store.Post("/buy", s.buyCrate())
+
+	// v1/tradeups/*
+	tradeups := v1.Group("tradeups")
+	tradeups.Put("/:tradeupId", s.addSkinToTradeup())
 }
