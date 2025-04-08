@@ -75,3 +75,27 @@ export const btnMap = {
     "Covert": "btn-covert",
     "Contraband": "btn-contraband",
 }
+
+export const wears = [
+    "Battle-Scarred",
+    "Well-Worn",
+    "Field-Tested",
+    "Minimal Wear",
+    "Factory New",
+]
+
+export const wearOrder = [
+    "Factory New",
+    "Minimal Wear",
+    "Field-Tested",
+    "Well-Worn",
+    "Battle-Scarred"
+]
+
+export const wearsToAbbr = {
+    "Battle-Scarred": "BS",
+    "Well-Worn": "WW",
+    "Field-Tested": "FT",
+    "Minimal Wear": "MW",
+    "Factory New": "FN",
+}
