@@ -19,7 +19,7 @@ type Storage interface {
 	GetUserByID(userID string) (api.User, error)
 	GetUserAndHashByEmail(email string) (api.User, string, error)
 	GetInventory(userID string) (api.Inventory, error)
-	GetRecentTradeups(userID string) ([]api.Tradeup, error)
+	GetRecentTradeups(userID string) ([]api.RecentTradeup, error)
 
 	// Store
 	BuyCrate(crateID, userID string, amount int) (float64, []api.Item, error)
@@ -49,12 +49,6 @@ type storage struct {
 
 func NewStorage(db *pgxpool.Pool, url string) Storage {
 	return &storage{db: db, cdnUrl: url}
-}
-
-func (s *storage) GetRecentTradeups(userID string) ([]api.Tradeup, error) {
-	var recentTradeups []api.Tradeup
-
-	return recentTradeups, nil
 }
 
 func (s *storage) BuyCrate(crateID, userID string, amount int) (float64, []api.Item, error) {
@@ -157,15 +151,6 @@ func (s *storage) BuyCrate(crateID, userID string, amount int) (float64, []api.I
 	}
 
 	return updatedBalance, addedItems, nil
-}
-
-func (s *storage) CheckSkinOwnership(invID, userID string) (bool, error) {
-	isOwned := false
-
-	q := "select exists(select 1 from inventory where id=$1 and user_id=$2)"
-	err := s.db.QueryRow(context.Background(), q, invID, userID).Scan(&isOwned)
-
-	return isOwned, err
 }
 
 // url + guns/ak/imageKey

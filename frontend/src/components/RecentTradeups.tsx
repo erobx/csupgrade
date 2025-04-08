@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router"
 import { User } from "../types/user"
-import { Skin } from "../types/skin"
+import { InventoryItem } from "../types/inventory"
 
 type Row = {
-  tradeupId: string;
+  id: string;
   rarity: string;
   status: string;
-  skins: Skin[];
-  value: number;
+  mode: string;
+  items: InventoryItem[];
 }
 
 export default function RecentTradeups({ user }: { user: User }) {
@@ -26,6 +26,10 @@ export default function RecentTradeups({ user }: { user: User }) {
           Authorization: `Bearer ${jwt}`,
         }
       })
+
+      if (res.status !== 200) {
+        return
+      }
 
       const data = await res.json()
       if (data) {
@@ -76,11 +80,11 @@ export default function RecentTradeups({ user }: { user: User }) {
         {rows.map((r, index) => (
           <ListRow
             key={index}
-            tradeupId={r.tradeupId}
+            tradeupId={r.id}
             rarity={r.rarity}
             status={r.status}
-            skins={r.skins}
-            value={r.value}
+            mode={r.mode}
+            items={r.items}
           />
         ))}
       </ul>
@@ -92,11 +96,11 @@ type ListRowProps = {
   tradeupId: string;
   rarity: string;
   status: string;
-  skins: Skin[];
-  value: number;
+  mode: string;
+  items: InventoryItem[];
 }
 
-function ListRow({ tradeupId, rarity, status, skins, value }: ListRowProps) {
+function ListRow({ tradeupId, rarity, status, mode, items }: ListRowProps) {
   const navigate = useNavigate()
   //const textColor = textMap[rarity]
   const textColor: string = ""
@@ -114,6 +118,8 @@ function ListRow({ tradeupId, rarity, status, skins, value }: ListRowProps) {
         setStatusColor("text-accent")
     }
   }, [status])
+  
+  const value: number = items.reduce((acc, curr) => acc + curr.data.price, 0)
 
   return (
     <li className="list-row">
@@ -127,21 +133,26 @@ function ListRow({ tradeupId, rarity, status, skins, value }: ListRowProps) {
         <div className={`${statusColor} font-bold`}>{status}</div>
       </div>
 
+      <div>
+        <div className="font-bold">Mode</div>
+        <div className="font-bold">{mode}</div>
+      </div>
+
       <div className="min-w-[300px] max-h-[100px] overflow-y-auto">
         <div className="font-bold sticky top-0 bg-base-300 z-10 pb-2">Skins Invested</div>
-        {skins.map((s, index) => (
+        {items.map((item, index) => (
           <div
             key={index}
             className={`
               ${index % 2 === 0 ? 'text-accent' : ''}
             `}>
-            {s.name} ({s.wear})
+            {item.data.name} ({item.data.wear})
           </div>
         ))}
       </div>
 
       <div className="ml-10 mr-10">
-        <div className="font-bold">Value</div>
+        <div className="font-bold">Total Invested</div>
         <div className="font-bold text-primary">${value.toFixed(2)}</div>
       </div>
 

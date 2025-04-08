@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/erobx/tradeups-backend/pkg/api"
 	"github.com/google/uuid"
@@ -88,4 +89,86 @@ func (s *storage) GetInventory(userID string) (api.Inventory, error) {
 	}
 
 	return inventory, nil
+}
+
+func (s *storage) CheckSkinOwnership(invID, userID string) (bool, error) {
+	isOwned := false
+
+	q := "select exists(select 1 from inventory where id=$1 and user_id=$2)"
+	err := s.db.QueryRow(context.Background(), q, invID, userID).Scan(&isOwned)
+
+	return isOwned, err
+}
+
+/*
+type Row = {
+  tradeupId: string;
+  rarity: string;
+  status: string;
+  skins: Skin[];
+  value: number;
+}
+*/
+
+func (s *storage) GetRecentTradeups(userID string) ([]api.RecentTradeup, error) {
+	var recentTradeups []api.RecentTradeup
+
+	q := `
+    SELECT
+        t.id AS tradeup_id,
+        t.rarity,
+        t.current_status AS status,
+        t.mode,
+        MAX(ts.entered) AS last_entered,
+        JSONB_AGG(
+			JSONB_BUILD_OBJECT(
+				'invId', i.id,
+				'data', JSONB_BUILD_OBJECT(
+					'name', s.name,
+					'wear', i.wear_str,
+					'price', i.price
+				),
+				'visible', true
+			)
+		) AS items
+    FROM 
+        tradeups t
+    INNER JOIN 
+        tradeups_skins ts ON t.id = ts.tradeup_id
+    INNER JOIN 
+        inventory i ON ts.inv_id = i.id
+    INNER JOIN 
+        skins s ON i.skin_id = s.id
+    WHERE 
+        i.user_id = $1
+    GROUP BY 
+        t.id, t.rarity, t.current_status, t.stop_time, t.mode
+    ORDER BY 
+        last_entered DESC
+	LIMIT 5
+    `
+
+	rows, err := s.db.Query(context.Background(), q, userID)
+	if err != nil {
+		return recentTradeups, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var t api.RecentTradeup
+		var itemsJSON string
+
+		if err := rows.Scan(
+			&t.ID, &t.Rarity, &t.Status, &t.Mode, &t.LastEntered, &itemsJSON);
+		err != nil {
+			return recentTradeups, err
+		}
+
+		if err := json.Unmarshal([]byte(itemsJSON), &t.Items); err != nil {
+			return nil, err
+		}
+		recentTradeups = append(recentTradeups, t)
+	}
+
+	return recentTradeups, nil
 }

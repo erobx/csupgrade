@@ -63,3 +63,12 @@ type Winnings struct {
 	Winner 	string	`json:"winner"`
 	Item 	Item	`json:"winningItem"`
 }
+
+type RecentTradeup struct {
+	ID         	int       	`json:"id"`
+    Rarity     	string    	`json:"rarity"`
+    Status     	string    	`json:"status"`
+    Mode       	string    	`json:"mode"`
+    LastEntered time.Time 	`json:"lastEntered"`
+    Items      	[]Item    	`json:"items"`
+}

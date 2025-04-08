@@ -134,7 +134,13 @@ func (s *Server) getRecentTradeups() fiber.Handler {
 		userID := c.Params("userId")
 		log.Println("Getting recent tradeups for:", userID)
 
-		return nil
+		recentTradeups, err := s.userService.GetRecentTradeups(userID)
+		if err != nil {
+			log.Printf("couldn't get recent tradeups for %s - %v\n", userID, err)
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		return c.JSON(recentTradeups)
 	}
 }
 
@@ -208,7 +214,6 @@ func (s *Server) removeSkinFromTradeup() fiber.Handler {
 }
 
 func (s *Server) handleWebSocket(c *websocket.Conn) {
-    log.Printf("New connection\n")
     userID := c.Query("userId")
 
     sessionID := ""
