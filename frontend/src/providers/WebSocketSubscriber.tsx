@@ -5,7 +5,7 @@ import { useLocation, useParams } from "react-router";
 export function WebSocketSubscriber() {
   const { pathname } = useLocation();
   const { tradeupId } = useParams();
-  const { subscribeToAll, subscribeToTradeup, unsubscribe, isConnected } = useWS();
+  const { setCurrentTradeup, subscribeToAll, subscribeToTradeup, unsubscribe, isConnected } = useWS();
 
   useEffect(() => {
     if (!isConnected) return

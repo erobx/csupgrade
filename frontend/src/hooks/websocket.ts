@@ -63,6 +63,10 @@ export function useWebSocket(userId: string) {
     }
   }, [userId]) // Reconnect only if userId changes (user logs in)
 
+  function clearCurrentTradeup() {
+    setCurrentTradeup(null)
+  }
+
   function subscribeToAll() {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify({ event: "subscribe_all" }))
@@ -87,5 +91,5 @@ export function useWebSocket(userId: string) {
     }
   }
 
-  return { tradeups, currentTradeup, winningItem, subscribeToAll, subscribeToTradeup, unsubscribe, sendLogin, isConnected }
+  return { tradeups, currentTradeup, clearCurrentTradeup, winningItem, subscribeToAll, subscribeToTradeup, unsubscribe, sendLogin, isConnected }
 }
