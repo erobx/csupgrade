@@ -30,18 +30,20 @@ func main() {
 	}
 	defer db.Close()
 
+	winnings := make(chan api.Winnings, 1)
+
 	cdnUrl := os.Getenv("SKINS_CDN_URL")
 	storage := repository.NewStorage(db, cdnUrl)
 	userService := api.NewUserService(storage)
 	storeService := api.NewStoreService(storage)
-	tradeupService := api.NewTradeupService(storage)
+	tradeupService := api.NewTradeupService(storage, winnings)
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(os.Getenv("RSA_PRIVATE_KEY")))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	server := app.NewServer("8080", privateKey, userService, storeService, tradeupService)
+	server := app.NewServer("8080", privateKey, userService, storeService, tradeupService, winnings)
 	server.Run()
 }
 

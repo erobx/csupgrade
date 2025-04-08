@@ -8,8 +8,8 @@ import TradeupsHome from './pages/TradeupsHome'
 import TradeupDetails from './pages/TradeupDetails'
 import DashboardPage from './pages/DashboardPage'
 import StorePage from './pages/StorePage'
-import Settings from './pages/Settings'
 import Navbar from './components/Navbar'
+import Notification from './components/Notification'
 import useAuth from './stores/authStore'
 import { useEffect, useState } from 'react'
 
@@ -85,6 +85,7 @@ export default function App() {
       <WebSocketProvider userId={userID}>
         <WebSocketSubscriber />
         <Navbar />
+        <Notification />
         <Routes>
           <Route index element={<Home />} />
           <Route path="/login/*" element={loggedIn ? <DashboardPage /> : <SignUpLogin />} />
@@ -94,9 +95,7 @@ export default function App() {
             <Route index element={<TradeupsHome />} />
             <Route path=":tradeupId" element={<TradeupDetails />} />
           </Route>
-
           <Route path="/dashboard/*" element={loggedIn ? <DashboardPage /> : <SignUpLogin />} />
-          <Route path="/settings" element={loggedIn ? <Settings /> : <SignUpLogin />} />
         </Routes>
       </WebSocketProvider>
     </InventoryProvider>

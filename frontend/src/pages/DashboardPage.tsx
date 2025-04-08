@@ -4,6 +4,7 @@ import DashboardDrawer from "../components/DashboardDrawer"
 import RecentTradeups from "../components/RecentTradeups"
 import Stats from "../components/Stats"
 import useAuth from "../stores/authStore"
+import Settings from "./Settings"
 
 export default function DashboardPage() {
   return (
@@ -13,6 +14,7 @@ export default function DashboardPage() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/inventory" element={<InventoryPage />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
     </div>

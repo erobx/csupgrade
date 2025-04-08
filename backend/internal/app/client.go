@@ -3,7 +3,6 @@ package app
 import (
 	"time"
 
-	"github.com/erobx/tradeups-backend/pkg/api"
 	"github.com/gofiber/contrib/websocket"
 )
 
@@ -29,5 +28,4 @@ type Client struct {
     SessionID string // Unique id for anon users
     SubscribedAll bool
     SubscribedID string
-    Inventory api.Inventory
 }

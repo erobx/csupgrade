@@ -24,9 +24,11 @@ type Server struct {
 	tradeupService 	api.TradeupService
 
     clients     	map[string]*Client
+	winnings		chan api.Winnings
 }
 
-func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.StoreService, ts api.TradeupService) *Server {
+func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, 
+				ss api.StoreService, ts api.TradeupService, w chan api.Winnings) *Server {
     s := &Server{
         addr: addr,
         app: fiber.New(),
@@ -36,6 +38,7 @@ func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.
 		storeService: ss,
 		tradeupService: ts,
         clients: make(map[string]*Client),
+		winnings: w,
     }
 
     s.UseMiddleware()
@@ -48,12 +51,15 @@ func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, ss api.
 }
 
 func (s *Server) Run() {
-    ticker := time.NewTicker(time.Second)
+    ticker := time.NewTicker(500 * time.Millisecond)
     go func() {
         for range ticker.C {
             s.broadcastState()
         }
     }()
+
+	go s.tradeupService.ProcessWinners()
+	go s.notifyWinners()
 
     log.Fatal(s.app.Listen(":"+s.addr))
 }
@@ -126,6 +132,26 @@ func (s *Server) broadcastState() {
 			client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
         }
     }
+}
+
+func (s *Server) notifyWinners() {
+	for {
+		select {
+		case winning := <-s.winnings:
+			// client currently has a connection, notify them
+			s.Lock()
+			if client, ok := s.clients[winning.Winner]; ok {
+				client.Conn.WriteJSON(fiber.Map{
+					"event": "tradeup_winner",
+					"userId": client.UserID,
+					"winningItem": winning.Item,
+				})
+			} else {
+				log.Println("winner not connected")
+			}
+			s.Unlock()
+		}
+	}
 }
 
 func (s *Server) maintainTradeupCount() {

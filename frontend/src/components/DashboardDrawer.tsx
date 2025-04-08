@@ -37,6 +37,13 @@ export default function DashboardDrawer() {
                 </div>
               </Link>
             </li>
+            <li>
+              <Link to="/dashboard/settings" className="font-bold text-sm">
+                <div className="flex gap-2 items-center">
+                  Settings
+                </div>
+              </Link>
+            </li>
           </ul>
         </div>
     </div>

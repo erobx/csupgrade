@@ -37,6 +37,9 @@ type Storage interface {
 	StopTimer(tradeupID string) error
 	GetStatus(tradeupID string) (string, error)
 	SetStatus(tradeupID, status string) error
+	GetExpired() ([]api.Tradeup, error)
+	DetermineWinner(tradeupID int) (string, error)
+	GiveNewItem(userID, rarity string, avgFloat float64) (api.Item, error)
 }
 
 type storage struct {

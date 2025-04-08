@@ -7,7 +7,7 @@ export default function Settings() {
     window.location.reload()
   }
 
-  const themes = ["dim", "light", "retro", "forest", "synthwave", "nord"]
+  const themes = ["dim", "light", "retro", "sunset"]
 
   useEffect(() => {
     themeChange(false)

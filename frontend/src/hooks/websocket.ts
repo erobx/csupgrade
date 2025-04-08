@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { Tradeup } from "../types/tradeup";
 import { useInventory } from "../providers/InventoryProvider";
+import { InventoryItem } from "../types/inventory";
+import { useNotification } from "../stores/notificationStore";
 
 export function useWebSocket(userId: string) {
   const [tradeups, setTradeups] = useState<Tradeup[]>([])
   const [currentTradeup, setCurrentTradeup] = useState<Tradeup | null>(null)
+  const [winningItem, setWinningItem] = useState<InventoryItem | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const { addItem } = useInventory()
+  const { setNotification } = useNotification()
   const ws = useRef<WebSocket>(null)
 
   useEffect(() => {
@@ -26,7 +30,6 @@ export function useWebSocket(userId: string) {
 
       ws.current.onmessage = (event: any) => {
         const data = JSON.parse(event.data)
-        console.log(data)
 
         if (data.event === "sync_state") {
           const tradeupArray: Tradeup[] = Object.values(data.tradeups)
@@ -35,7 +38,9 @@ export function useWebSocket(userId: string) {
           setCurrentTradeup(data.tradeup)
         } else if (data.event === "tradeup_winner") {
           if (data.userId === userId) {
-            //addItem({ ...data.winningItem, visible: true })
+            addItem({ ...data.winningItem, visible: true })
+            setWinningItem(data.winningItem)
+            setNotification(`New item won ${data.winningItem.data.name}`)
           }
         } else if (data.event === "new_item") {
           addItem({ ...data.item, visible: true })
@@ -82,5 +87,5 @@ export function useWebSocket(userId: string) {
     }
   }
 
-  return { tradeups, currentTradeup, subscribeToAll, subscribeToTradeup, unsubscribe, sendLogin, isConnected }
+  return { tradeups, currentTradeup, winningItem, subscribeToAll, subscribeToTradeup, unsubscribe, sendLogin, isConnected }
 }

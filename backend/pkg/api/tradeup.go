@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"log"
+	"time"
 )
 
 type TradeupService interface {
@@ -10,6 +11,7 @@ type TradeupService interface {
 	GetTradeupByID(tradeupID string) (Tradeup, error)
 	AddSkinToTradeup(tradeupID, invID, userID string) error
 	RemoveSkinFromTradeup(tradeupID, invID, userID string) error
+	ProcessWinners()
 }
 
 type TradeupRepository interface {
@@ -23,15 +25,18 @@ type TradeupRepository interface {
 	StartTimer(tradeupID string) error
 	StopTimer(tradeupID string) error
 	GetStatus(tradeupID string) (string, error)
-	SetStatus(tradeupID, status string) error
+	GetExpired() ([]Tradeup, error)
+	DetermineWinner(tradeupID int) (string, error)
+	GiveNewItem(userID, rarity string, avgFloat float64) (Item, error)
 }
 
 type tradeupService struct {
-	storage TradeupRepository
+	storage 	TradeupRepository
+	winnings 	chan Winnings
 }
 
-func NewTradeupService(tr TradeupRepository) TradeupService {
-	return &tradeupService{storage: tr}
+func NewTradeupService(tr TradeupRepository, w chan Winnings) TradeupService {
+	return &tradeupService{storage: tr, winnings: w}
 }
 
 func (ts *tradeupService) GetAllTradeups() ([]Tradeup, error) {
@@ -111,6 +116,51 @@ func (ts *tradeupService) RemoveSkinFromTradeup(tradeupID, invID, userID string)
 
 // Get tradeups with status waiting that have an expired stop time.
 // Decide winner and give winner new skin.
-func (ts *tradeupService) ProcessWinner() {
+func (ts *tradeupService) ProcessWinners() {
+	ticker := time.NewTicker(3 * time.Second)
+	for range ticker.C {
+		expired, err := ts.storage.GetExpired()
+		if err != nil {
+			log.Printf("couldn't get expired - %v\n", err)
+			return
+		}
 
+		for _, exp := range expired {
+			winner, err := ts.storage.DetermineWinner(exp.ID)
+			log.Printf("user %s won tradeup %d\n", winner, exp.ID)
+			if err != nil {
+				log.Printf("couldn't determine winner for tradeup %d - %v\n", exp.ID, err)
+				return
+			}
+
+			floatTotal := 0.0
+			for _, item := range exp.Items {
+				skin, ok := item.Data.(Skin)
+				if ok {
+					floatTotal += skin.Float
+				}
+			}
+
+			rarity := GetNextRarity(exp.Rarity)
+			if rarity == "" {
+				log.Println("error getting rarity")
+				return
+			}
+
+			// give user new skin
+			newItem, err := ts.storage.GiveNewItem(winner, rarity, floatTotal/10)
+			if err != nil {
+				log.Printf("couldn't give user %s new item\n", winner)
+				return
+			}
+
+			winning := Winnings{
+				Winner: winner,
+				Item: newItem,
+			}
+
+			ts.winnings <- winning
+		}
+	}
 }
+

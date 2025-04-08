@@ -27,22 +27,9 @@ function TradeupDetails() {
             <span className="font-bold">—</span>
             <span className="font-bold text-2xl text-info">{currentTradeup.status}</span>
           </div>
-          {currentTradeup.items.length === 10 && currentTradeup.status !== 'Completed' ? (
+          {currentTradeup.items.length === 10 && currentTradeup.status !== 'Completed' && (
             <div className="font-bold text-lg">Tradeup Closes In: <CountdownTimer stopTime={currentTradeup.stopTime} /></div>
-            ) : (
-            <div className="font-bold text-lg">Tradeup Countdown:
-              <div className="flex space-x-4 bg-base-100 p-4 rounded-lg">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-warning">5</div>
-                  <div className="text-xs">Minutes</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-warning">00</div>
-                  <div className="text-xs">Seconds</div>
-                </div>
-              </div>
-            </div>
-          )}
+            )}
           <TradeupGrid
             tradeupId={currentTradeup.id}
             rarity={currentTradeup.rarity}

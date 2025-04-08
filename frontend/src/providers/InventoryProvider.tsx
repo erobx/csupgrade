@@ -30,7 +30,6 @@ export function InventoryProvider({ children, userId }: InventoryProviderProps) 
         }
       })
       const data: Inventory = await res.json()
-      console.log(data)
       setInventory(data)
     }
     if (userId) {
@@ -50,7 +49,6 @@ export function InventoryProvider({ children, userId }: InventoryProviderProps) 
       prev ? { ...prev, items: prev.items.filter((item) => item.invId !== invId) } : null
     )
   }
-
   function ownsItem(invId: string) {
     return inventory?.items.some((item) => item.invId === invId) ?? false
   }

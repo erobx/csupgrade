@@ -1,10 +1,12 @@
 import { createContext, ReactNode, useContext } from "react";
 import { useWebSocket } from "../hooks/websocket";
 import { Tradeup } from "../types/tradeup";
+import { InventoryItem } from "../types/inventory";
 
 interface WebSocketContextType {
   tradeups: Tradeup[];
   currentTradeup: Tradeup | null;
+  winningItem: InventoryItem | null;
   subscribeToAll: () => void;
   subscribeToTradeup: (tradeupId: string) => void;
   unsubscribe: () => void;

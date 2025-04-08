@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 func (s *Server) register() fiber.Handler {
@@ -212,7 +213,7 @@ func (s *Server) handleWebSocket(c *websocket.Conn) {
 
     sessionID := ""
     if userID == "" {
-        sessionID = "anon"
+        sessionID = uuid.NewString()
         userID = sessionID
     }
 

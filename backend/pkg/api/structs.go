@@ -58,3 +58,8 @@ type Skin struct {
     ImgSrc      string      `json:"imgSrc"`
     CreatedAt   time.Time   `json:"createdAt"`
 }
+
+type Winnings struct {
+	Winner 	string	`json:"winner"`
+	Item 	Item	`json:"winningItem"`
+}

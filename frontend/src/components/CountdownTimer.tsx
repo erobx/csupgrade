@@ -5,7 +5,7 @@ export default function CountdownTimer({ stopTime }: { stopTime: any }) {
 
   function calculateTimeRemaining() {
     // Parse the stopTime (assuming it's a valid ISO date string)
-    const stopDate = new Date(stopTime)
+    const stopDate = new Date(stopTime.replace("Z", ""))
     const now = new Date();
     
     // Calculate the difference

@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import RarityBadge from "../components/RarityBadge"
 import StatTrakBadge from "../components/StatTrakBadge"
 import { outlineMap } from "../constants/constants"
@@ -10,6 +11,11 @@ export default function InventoryPage() {
   const handleFilter = () => {
   }
 
+  const displayItems = useMemo(() => {
+    if (!inventory) return []
+    return inventory.items.filter((item) => item.visible)
+  }, [inventory])
+
   if (!inventory) return <div className="loading-spinner loading-md"></div>
 
   return (
@@ -18,18 +24,16 @@ export default function InventoryPage() {
         {inventory.items.length === 0 ? (
           <h1 className="text-xl font-bold text-info">Visit the Store for more skins!</h1>
         ) : (
-          inventory.items
-            .filter((item) => item.visible) // Hide tradeup skins
-            .map((item) => (
-              <div key={item.invId} className="card bg-base-300">
-                {item.data ? (
-                  <InventoryItem skin={item.data} />
-                ) : (
-                  <div className="loading-spinner loading-xl"></div>
-                )}
-              </div>
-            ))
-          )}
+          displayItems.map((item) => (
+            <div key={item.invId} className="card bg-base-300">
+              {item.data ? (
+                <InventoryItem skin={item.data} />
+              ) : (
+                <div className="loading-spinner loading-xl"></div>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       <div className="card flex flex-col items-center text-center gap-3 bg-base-200 p-4 h-fit w-fit lg:w-[14vw]">
