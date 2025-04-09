@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -12,9 +11,9 @@ import (
 
 	"github.com/erobx/tradeups-backend/internal/app"
 	"github.com/erobx/tradeups-backend/pkg/api"
+	"github.com/erobx/tradeups-backend/pkg/db"
 	"github.com/erobx/tradeups-backend/pkg/repository"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
@@ -24,7 +23,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	db, err := createConnection()
+	db, err := db.CreateConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,15 +45,6 @@ func main() {
 
 	server := app.NewServer("8080", privateKey, logService, userService, storeService, tradeupService, winnings)
 	server.Run()
-}
-
-func createConnection() (*pgxpool.Pool, error) {
-	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
-	if err != nil {
-		return nil, err
-	}
-
-	return pool, err
 }
 
 func generate() {

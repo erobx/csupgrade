@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import RarityBadge from "../components/RarityBadge"
 import StatTrakBadge from "../components/StatTrakBadge"
 import PageSelector from "../components/PageSelector"
 import { outlineMap } from "../constants/constants"
 import { useInventory } from "../providers/InventoryProvider"
 import { Skin } from "../types/skin"
-import { rarityOrder, wearOrder } from "../constants/constants"
+import { rarityOrder } from "../constants/constants"
 import useAuth from "../stores/authStore"
 
 export default function InventoryPage() {
@@ -30,7 +30,7 @@ export default function InventoryPage() {
         case "Wear":
           return a.data.float - b.data.float
         case "Price":
-          return a.data.price - b.data.price
+          return b.data.price - a.data.price
         default:
           return b.data.createdAt - a.data.createdAt
       }
@@ -107,7 +107,11 @@ function InventoryItem({ skin }: { skin: Skin }) {
     <div
       className={`card card-xs w-54 bg-base-300 shadow-md cursor-pointer hover:outline-4 ${outlineColor}`}
     >
-      <h1 className="font-bold text-accent ml-1.5">${skin.price.toFixed(2)}</h1>
+      {skin.price !== 0 ? (
+        <h1 className="font-bold text-accent ml-1.5">${skin.price.toFixed(2)}</h1>
+      ) : (
+        <h1 className="font-bold text-accent ml-1.5">N/A</h1>
+      )}
       <figure>
         <div>
           <img
