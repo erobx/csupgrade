@@ -3,6 +3,7 @@ import { Tradeup } from "../types/tradeup"
 import TradeupRow from "../components/Tradeups/TradeupRow"
 import { useState } from "react"
 import { btnMap, rarityOrder } from "../constants/constants"
+import Footer from "../components/Footer"
 
 function TradeupsHome() {
   const { tradeups } = useWS()
@@ -57,6 +58,7 @@ function TradeupsHome() {
           <h1 className="font-bold text-info">No tradeups available.</h1>
         </div>
       )}
+      <Footer />
     </div>
   )
 }

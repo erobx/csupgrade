@@ -1,9 +1,10 @@
 import { Link } from "react-router"
+import Footer from "../components/Footer"
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
-      <div className='flex flex-col items-center w-full flex-grow'> 
+      <div className="flex flex-col flex-grow items-center w-full"> 
         <PageTop />
         <PageMiddle />
         <Footer />
@@ -32,20 +33,10 @@ function PageTop() {
 
 function PageMiddle() {
   return (
-    <div className="hero bg-base-200 h-96">
+    <div className="hero bg-base-200 flex-grow">
       <div className="hero-content text-center justify-between">
         <h1 className="text-4xl font-bold">Over ....</h1>
       </div>
     </div>
-  )
-}
-
-function Footer() {
-  return (
-    <footer className="footer sm:footer-horizontal bg-neutral text-neutral-content p-4 mt-auto w-full">
-      <aside className="grid-flow-col items-center">
-        <p>Copyright @ {new Date().getFullYear()} - All right reserved</p>
-      </aside>
-    </footer>
   )
 }

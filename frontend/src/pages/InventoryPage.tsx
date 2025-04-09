@@ -50,8 +50,8 @@ export default function InventoryPage() {
   if (!inventory) return <div className="loading-spinner loading-md"></div>
 
   return (
-    <div className="flex gap-6">
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-2">
+    <div className="flex lg:flex-row gap-6 md:flex-col md:w-fit md:m-auto md:mt-5">
+      <div className="grid grid-cols-3 lg:grid-cols-6 gap-2">
         {inventory.items.length === 0 ? (
           <h1 className="text-xl font-bold text-info">Visit the Store for more skins!</h1>
         ) : (
@@ -74,7 +74,7 @@ export default function InventoryPage() {
         )}
       </div>
 
-      <div className="card flex flex-col items-center text-center gap-3 bg-base-200 p-4 h-fit w-fit lg:w-[14vw]">
+      <div className="card flex flex-col items-center text-center gap-3 bg-base-200 p-4 h-fit w-full lg:w-[14vw]">
         <h1 className="font-bold text-lg">Settings</h1>
         <form className="filter" onClick={handleFilter}>
           <input className="btn btn-soft btn-square" type="reset" value="×"/>
@@ -101,11 +101,9 @@ export default function InventoryPage() {
 }
 
 function InventoryItem({ skin }: { skin: Skin }) {
-  const outlineColor = outlineMap[skin.rarity]
-
   return (
     <div
-      className={`card card-xs w-54 bg-base-300 shadow-md cursor-pointer hover:outline-4 ${outlineColor}`}
+      className={`card card-xs w-54 bg-base-300 shadow-sm cursor-pointer hover:shadow-xl hover:shadow-pink-100`}
     >
       {skin.price !== 0 ? (
         <h1 className="font-bold text-accent ml-1.5">${skin.price.toFixed(2)}</h1>

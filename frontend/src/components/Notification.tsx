@@ -15,7 +15,7 @@ export default function Notification() {
   }, [notifications])
 
   return (
-    <div className="toast toast-end">
+    <div className="toast toast-end z-40">
       {notifications.map((notification, index) => (
         <div key={index} className="alert alert-info">
           <span>{notification}</span>

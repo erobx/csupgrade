@@ -24,7 +24,7 @@ export default function TradeupGrid({ tradeupId, rarity, items, status}: Tradeup
   const owernship: boolean[] = items.map(item => ownsItem(item.invId))
 
   return (
-    <div className="grid grid-cols-5 grid-rows-2 rounded mt-5 gap-2">
+    <div className="grid lg:grid-cols-5 grid-rows-2 md:grid-cols-2 rounded mt-5 gap-2">
       {skins.map((skin, index) => (
         <GridItem 
           invId={invIds[index]}
@@ -61,7 +61,7 @@ type GridItemProps = {
 }
 
 function GridItem({ invId, tradeupId, name, wear, price, isStatTrak, imgSrc, owned, status, setItemVisibility }: GridItemProps) {
-  const outlineColor = owned ? "outline-accent" : "outline-error"
+  const shadowColor = owned ? "shadow-accent" : "shadow-error"
 
   const onSelect = () => {
     if (owned && status !== "Completed") {
@@ -71,7 +71,7 @@ function GridItem({ invId, tradeupId, name, wear, price, isStatTrak, imgSrc, own
 
   return (
     <div
-      className={`card card-xs w-48 bg-base-200 shadow-md m-0.5 hover:outline-4 hover:cursor-pointer ${outlineColor}`}
+      className={`card card-xs w-48 bg-base-200 shadow-md m-0.5 hover:shadow-lg hover:${shadowColor} hover:cursor-pointer`}
       onClick={onSelect}
     >
       {owned ? (

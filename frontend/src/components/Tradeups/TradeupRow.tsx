@@ -27,7 +27,7 @@ export default function TradeupRow({ id, players, rarity, items, mode }: Tradeup
   const totalPrice: number = skins.reduce((acc, curr) => acc + curr.price, 0)
 
   return (
-    <div className="join bg-base-300 border-6 border-base-200 items-center lg:w-3/4 rounded-md">
+    <div className="join bg-base-300 border-6 border-base-200 items-center w-full lg:w-3/4 rounded-md">
       <div className="join-item">
         <InfoPanel 
           rarity={rarity} 

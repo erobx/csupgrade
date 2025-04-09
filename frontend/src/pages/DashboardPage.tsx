@@ -8,15 +8,13 @@ import Settings from "./Settings"
 
 export default function DashboardPage() {
   return (
-    <div className="gap-2 lg:flex">
+    <div className="flex gap-2">
       <DashboardDrawer />
-      <div className="mt-2">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/inventory" element={<InventoryPage />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/inventory" element={<InventoryPage />} />
+        <Route path="/settings" element={<Settings />} />
+      </Routes>
     </div>
   )
 }
@@ -31,7 +29,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="flex justify-center mb-5">
+    <div className="flex lg:flex-row sm:flex-col mt-5">
       <RecentTradeups user={user} />
       <div className="divider lg:divider-horizontal"></div>
       <Stats user={user} />

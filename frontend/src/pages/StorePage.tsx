@@ -1,4 +1,5 @@
 import Crate from "../components/Crate"
+import Footer from "../components/Footer"
 
 export default function StorePage() {
   return (
@@ -34,6 +35,7 @@ export default function StorePage() {
         </div>
 
       </div>
+      <Footer />
     </div>
   )
 }

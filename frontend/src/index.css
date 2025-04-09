@@ -24,6 +24,10 @@ body, html {
     @apply w-1;
 }
 
+.shadow-consumer {
+    --tw-shadow-color: var(--consumer);
+}
+
 .badge-consumer {
     --badge-color: var(--consumer);
     color: black;

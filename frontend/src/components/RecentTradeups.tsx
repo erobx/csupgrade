@@ -72,7 +72,7 @@ export default function RecentTradeups({ user }: { user: User }) {
   }
 
   return (
-    <div className="w-fit bg-base-300 rounded-box shadow-md">
+    <div className="w-fit h-fit bg-base-300 rounded-box shadow-md">
       <ul className="list">
         <div className="flex items-center">
           <li className="p-4 pb-2 text-sm opacity-70 tracking-wide">Recent Trade Ups</li>
