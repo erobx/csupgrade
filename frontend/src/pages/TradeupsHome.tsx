@@ -1,21 +1,48 @@
 import { useWS } from "../providers/WebSocketProvider"
 import { Tradeup } from "../types/tradeup"
 import TradeupRow from "../components/Tradeups/TradeupRow"
-import { useMemo } from "react"
+import { useState } from "react"
+import { btnMap, rarityOrder } from "../constants/constants"
 
 function TradeupsHome() {
   const { tradeups } = useWS()
+  const [selectedRarity, setSelectedRarity] = useState("All")
 
-  const displayTradeups = useMemo(() => {
-    return tradeups.sort((a, b) => parseInt(a.id) - parseInt(b.id))
-  }, [tradeups])
+  const sorted = tradeups.sort((a, b) => parseInt(a.id) - parseInt(b.id))
+  const displayTradeups = selectedRarity === "All"
+      ? sorted
+      : sorted.filter(t => t.rarity === selectedRarity)
+
+  const handleReset = () => {
+    setSelectedRarity("All")
+  }
 
   return (
     <div className="flex flex-col items-center gap-2 mt-3">
       <h1 className="text-warning font-bold text-3xl">Active Tradeups</h1>
       {/* Status Filter Dropwdown */}
+      <div className="filter mb-4 flex gap-1">
+        <input
+          className="btn btn-soft filter-reset"
+          type="radio"
+          name=""
+          aria-label="×"
+          onClick={handleReset}
+        />
+        {rarityOrder.filter(r => r !== "All").map(rarity => (
+          <input
+            key={rarity}
+            className={`btn btn-soft ${btnMap[rarity] || ''}`}
+            type="radio"
+            name="rarity"
+            aria-label={rarity}
+            checked={selectedRarity === rarity}
+            onChange={() => setSelectedRarity(rarity)}
+          />
+        ))}
+      </div>
 
-      {tradeups.length > 0 ? (
+      {displayTradeups.length > 0 ? (
         displayTradeups.map((t: Tradeup) =>
           <TradeupRow
             id={t.id}
@@ -26,7 +53,9 @@ function TradeupsHome() {
           />
         )
       ) : (
-        <p>No tradeups available.</p>
+        <div className="card p-8 bg-base-300">
+          <h1 className="font-bold text-info">No tradeups available.</h1>
+        </div>
       )}
     </div>
   )

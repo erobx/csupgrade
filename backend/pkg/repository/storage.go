@@ -29,6 +29,7 @@ type Storage interface {
 	GetTradeupByID(tradeupID string) (api.Tradeup, error)
 	AddSkinToTradeup(tradeupID, invID string) error
 	RemoveSkinFromTradeup(tradeupID, invID string) error
+	MaintainTradeupCount() error
 
 	// Helpers
 	CheckSkinOwnership(invID, userID string) (bool, error)

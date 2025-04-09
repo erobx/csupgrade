@@ -34,16 +34,17 @@ func main() {
 
 	cdnUrl := os.Getenv("SKINS_CDN_URL")
 	storage := repository.NewStorage(db, cdnUrl)
-	userService := api.NewUserService(storage)
-	storeService := api.NewStoreService(storage)
-	tradeupService := api.NewTradeupService(storage, winnings)
+	logService := api.NewLogger()
+	userService := api.NewUserService(storage, logService)
+	storeService := api.NewStoreService(storage, logService)
+	tradeupService := api.NewTradeupService(storage, winnings, logService)
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(os.Getenv("RSA_PRIVATE_KEY")))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	server := app.NewServer("8080", privateKey, userService, storeService, tradeupService, winnings)
+	server := app.NewServer("8080", privateKey, logService, userService, storeService, tradeupService, winnings)
 	server.Run()
 }
 

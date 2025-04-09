@@ -387,3 +387,31 @@ func (s *storage) GiveNewItem(userID, rarity string, avgFloat float64) (api.Item
 
 	return item, nil
 }
+
+func (s *storage) MaintainTradeupCount() error {
+	rarities := []string{"Consumer", "Industrial", "Mil-Spec", "Restricted", "Classified"}
+	tx, err := s.db.BeginTx(context.Background(), pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
+    
+    for _, r := range rarities {
+		count := 0
+        q := "select count(*) from tradeups where rarity=$1 and current_status in ('Active', 'Waiting')"
+        if err := tx.QueryRow(context.Background(), q, r).Scan(&count); err != nil {
+			return err
+        }
+        
+        if count < 3 {
+			q := "insert into tradeups(rarity) values($1)"
+			_, err := tx.Exec(context.Background(), q, r)
+			if err != nil {
+				tx.Rollback(context.Background())
+				return err
+			}
+        }
+    }
+
+	tx.Commit(context.Background())
+	return nil
+}

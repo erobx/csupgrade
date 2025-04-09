@@ -31,7 +31,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="flex mb-5">
+    <div className="flex justify-center mb-5">
       <RecentTradeups user={user} />
       <div className="divider lg:divider-horizontal"></div>
       <Stats user={user} />

@@ -19,6 +19,7 @@ type Server struct {
     app         	*fiber.App
 	validator 		Validator
 
+	logger			api.LogService
 	userService 	api.UserService
 	storeService 	api.StoreService
 	tradeupService 	api.TradeupService
@@ -27,13 +28,14 @@ type Server struct {
 	winnings		chan api.Winnings
 }
 
-func NewServer(addr string, privKey *rsa.PrivateKey, us api.UserService, 
+func NewServer(addr string, privKey *rsa.PrivateKey, logger api.LogService, us api.UserService, 
 				ss api.StoreService, ts api.TradeupService, w chan api.Winnings) *Server {
     s := &Server{
         addr: addr,
         app: fiber.New(),
 		validator: NewValidator(),
 		privateKey: privKey,
+		logger: logger,
 		userService: us,
 		storeService: ss,
 		tradeupService: ts,
@@ -58,6 +60,7 @@ func (s *Server) Run() {
         }
     }()
 
+	go s.tradeupService.MaintainTradeupCount()
 	go s.tradeupService.ProcessWinners()
 	go s.notifyWinners()
 
@@ -91,7 +94,7 @@ func (s *Server) handleSubscription(userID string, msg []byte) {
         client.SubscribedID = ""
 		tradeups, err := s.tradeupService.GetAllTradeups()
 		if err != nil {
-			log.Printf("Error getting tradeups - %v\n", err)
+			s.logger.Error("couldn't get tradeups", "error", err)
 			return
 		}
         client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": tradeups})
@@ -100,7 +103,7 @@ func (s *Server) handleSubscription(userID string, msg []byte) {
         client.SubscribedID = payload.TradeupID
 		t, err := s.tradeupService.GetTradeupByID(payload.TradeupID)
 		if err != nil {
-			log.Printf("Error getting tradeup %s - %v\n", payload.TradeupID, err)
+			s.logger.Error("couldn't get tradeup", "tradeupID", payload.TradeupID, "error", err)
 			return
 		}
 		client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
@@ -147,12 +150,9 @@ func (s *Server) notifyWinners() {
 					"winningItem": winning.Item,
 				})
 			} else {
-				log.Println("winner not connected")
+				s.logger.Info("winner not connected", "winner", winning.Winner)
 			}
 			s.Unlock()
 		}
 	}
-}
-
-func (s *Server) maintainTradeupCount() {
 }

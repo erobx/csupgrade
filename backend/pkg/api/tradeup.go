@@ -12,6 +12,7 @@ type TradeupService interface {
 	AddSkinToTradeup(tradeupID, invID, userID string) error
 	RemoveSkinFromTradeup(tradeupID, invID, userID string) error
 	ProcessWinners()
+	MaintainTradeupCount()
 }
 
 type TradeupRepository interface {
@@ -19,6 +20,7 @@ type TradeupRepository interface {
 	GetTradeupByID(tradeupID string) (Tradeup, error)
 	AddSkinToTradeup(tradeupID, invID string) error
 	RemoveSkinFromTradeup(tradeupID, invID string) error
+	MaintainTradeupCount() error
 
 	CheckSkinOwnership(invID, userID string) (bool, error)
 	IsTradeupFull(tradeupID string) (bool, error)
@@ -33,10 +35,11 @@ type TradeupRepository interface {
 type tradeupService struct {
 	storage 	TradeupRepository
 	winnings 	chan Winnings
+	logger		LogService
 }
 
-func NewTradeupService(tr TradeupRepository, w chan Winnings) TradeupService {
-	return &tradeupService{storage: tr, winnings: w}
+func NewTradeupService(tr TradeupRepository, w chan Winnings, logger LogService) TradeupService {
+	return &tradeupService{storage: tr, winnings: w, logger: logger}
 }
 
 func (ts *tradeupService) GetAllTradeups() ([]Tradeup, error) {
@@ -161,6 +164,17 @@ func (ts *tradeupService) ProcessWinners() {
 
 			ts.winnings <- winning
 		}
+		ts.logger.Info("processed winners", "expired", expired)
 	}
 }
 
+func (ts *tradeupService) MaintainTradeupCount() {
+	ticker := time.NewTicker(4 * time.Second)
+	for range ticker.C {
+		ts.logger.Info("maintaining tradeup count")
+		err := ts.storage.MaintainTradeupCount()
+		if err != nil {
+			ts.logger.Error("couldn't maintain tradeup count", "error", err)
+		}
+	}
+}

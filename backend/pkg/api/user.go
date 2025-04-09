@@ -30,11 +30,12 @@ type UserRepository interface {
 
 type userService struct {
 	storage UserRepository
+	logger LogService
 }
 
 // Handles all user requests
-func NewUserService(userRepo UserRepository) UserService {
-	return &userService{storage: userRepo}
+func NewUserService(userRepo UserRepository, logger LogService) UserService {
+	return &userService{storage: userRepo, logger: logger}
 }
 
 // Creates a new user and returns their ID

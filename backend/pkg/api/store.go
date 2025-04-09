@@ -10,10 +10,11 @@ type StoreRepository interface {
 
 type storeService struct {
 	storage StoreRepository
+	logger LogService
 }
 
-func NewStoreService(storeRepo StoreRepository) StoreService {
-	return &storeService{storage: storeRepo}
+func NewStoreService(storeRepo StoreRepository, logger LogService) StoreService {
+	return &storeService{storage: storeRepo, logger: logger}
 }
 
 // Updates the user's current balance if they can purchase and adds skins to
@@ -23,6 +24,8 @@ func (s *storeService) BuyCrate(crateID, userID string, amount int) (float64, []
 	if err != nil {
 		return updatedBalance, addedItems, err
 	}
+
+	s.logger.Info("successfully bought crate", "crate", crateID, "user", userID)
 
 	return updatedBalance, addedItems, nil
 }

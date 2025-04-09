@@ -1,12 +1,12 @@
 import { useInventory } from "../providers/InventoryProvider";
 import useAuth from "../stores/authStore"
+import { useNotification } from "../stores/notificationStore";
 import { InventoryItem } from "../types/inventory";
 
 type CrateProps = {
   crateId: string;
   name: string;
   amount: number;
-  setToastMessage: (msg: string) => void;
 }
 
 type Response = {
@@ -14,9 +14,10 @@ type Response = {
   items: InventoryItem[];
 }
 
-export default function Crate({ crateId, name, amount, setToastMessage }: CrateProps) {
+export default function Crate({ crateId, name, amount }: CrateProps) {
   const { user, setBalance } = useAuth()
   const { addItem } = useInventory()
+  const { addNotification } = useNotification()
 
   const handleSubmit = async () => {
     const jwt = localStorage.getItem("jwt")
@@ -31,7 +32,7 @@ export default function Crate({ crateId, name, amount, setToastMessage }: CrateP
         })
 
         if (res.status === 500) {
-          setToastMessage("Insufficient funds")
+          addNotification("Insufficient funds")
           return
         }
 
@@ -40,11 +41,13 @@ export default function Crate({ crateId, name, amount, setToastMessage }: CrateP
           data.items.map(item => {
             addItem(item)
           })
+          addNotification("Crate purchased successfully!")
         }
 
         setBalance(data.balance)
       } catch (error) {
         console.error(error)
+        addNotification("An error occurred while purchasing the crate.")
       }
     }
   }

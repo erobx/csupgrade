@@ -20,7 +20,7 @@ export default function InventoryPage() {
     setCurrentPage(1)
   }
 
-  const sortedItems = useMemo(() => {
+  const getSortedItems = () => {
     if (!inventory) return []
     const sorted = [...inventory.items]
     sorted.sort((a, b) => {
@@ -36,7 +36,9 @@ export default function InventoryPage() {
       }
     })
     return sorted
-  }, [inventory, filter])
+  }
+
+  const sortedItems = getSortedItems()
 
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage

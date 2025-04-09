@@ -2,25 +2,25 @@ import { useEffect } from "react"
 import { useNotification } from "../stores/notificationStore"
 
 export default function Notification() {
-  const { notification, clearNotification } = useNotification()
+  const { notifications, removeNotification } = useNotification()
 
   useEffect(() => {
-    if (notification) {
+    if (notifications.length > 0) {
       const timer = setTimeout(() => {
-        clearNotification()
+        removeNotification(notifications[0])
       }, 3000)
 
       return () => clearTimeout(timer)
     }
-  }, [notification, clearNotification])
+  }, [notifications])
 
   return (
-    notification && (
-      <div className="toast toast-end">
-        <div className="alert alert-info">
+    <div className="toast toast-end">
+      {notifications.map((notification, index) => (
+        <div key={index} className="alert alert-info">
           <span>{notification}</span>
         </div>
-      </div>
-    )
+      ))}
+    </div>
   )
 }

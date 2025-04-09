@@ -10,7 +10,7 @@ export function useWebSocket(userId: string) {
   const [winningItem, setWinningItem] = useState<InventoryItem | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const { addItem } = useInventory()
-  const { setNotification } = useNotification()
+  const { addNotification } = useNotification()
   const ws = useRef<WebSocket>(null)
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function useWebSocket(userId: string) {
           if (data.userId === userId) {
             addItem({ ...data.winningItem, visible: true })
             setWinningItem(data.winningItem)
-            setNotification(`New item won ${data.winningItem.data.name}`)
+            addNotification(`New item won ${data.winningItem.data.name}`)
           }
         } else if (data.event === "new_item") {
           addItem({ ...data.item, visible: true })
