@@ -157,7 +157,7 @@ function ListRow({ tradeupId, rarity, status, mode, items }: ListRowProps) {
       </div>
 
       <div className="mr-8">
-        <button className="btn btn-soft btn-warning" 
+        <button className="btn btn-warning" 
           onClick={() => navigate(`/tradeups/${tradeupId}`)}
         >
           View

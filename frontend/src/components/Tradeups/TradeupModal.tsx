@@ -40,7 +40,7 @@ export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string,
 
   return (
     <div className="h-48">
-      <button className="btn btn-primary" onClick={onClick}>Add Skin</button>
+      <button className="btn btn-info" onClick={onClick}>Add Skin</button>
       <dialog id="modal_add" className="modal">
         <div className="modal-box max-w-7xl max-h-3xl">
           <h3 className="font-bold text-lg mb-1">Showing all available skins...</h3>
@@ -48,6 +48,7 @@ export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string,
           {currentItems ? (
             currentItems.map(item => (
               <ModalItem
+                key={item.invId}
                 invId={item.invId}
                 tradeupId={tradeupId}
                 skin={item.data}

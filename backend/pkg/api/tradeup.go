@@ -34,12 +34,18 @@ type TradeupRepository interface {
 
 type tradeupService struct {
 	storage 	TradeupRepository
+	skinsAdded	map[string]map[string]int // user => tradeupID => amount
 	winnings 	chan Winnings
 	logger		LogService
 }
 
 func NewTradeupService(tr TradeupRepository, w chan Winnings, logger LogService) TradeupService {
-	return &tradeupService{storage: tr, winnings: w, logger: logger}
+	return &tradeupService{
+		storage: tr, 
+		skinsAdded: make(map[string]map[string]int),
+		winnings: w, 
+		logger: logger,
+	}
 }
 
 func (ts *tradeupService) GetAllTradeups() ([]Tradeup, error) {
@@ -68,7 +74,7 @@ func (ts *tradeupService) AddSkinToTradeup(tradeupID, invID, userID string) erro
 	if isFull {
 		return errors.New("cannot add skin - tradeup is full")
 	}
-
+	
 	err = ts.storage.AddSkinToTradeup(tradeupID, invID)
 	if err != nil {
 		return err

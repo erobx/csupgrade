@@ -26,6 +26,9 @@ type Server struct {
 
     clients     	map[string]*Client
 	winnings		chan api.Winnings
+
+	tradeupCache	map[string]api.Tradeup
+	lastFetchTime	time.Time
 }
 
 func NewServer(addr string, privKey *rsa.PrivateKey, logger api.LogService, us api.UserService, 
@@ -41,6 +44,7 @@ func NewServer(addr string, privKey *rsa.PrivateKey, logger api.LogService, us a
 		tradeupService: ts,
         clients: make(map[string]*Client),
 		winnings: w,
+		tradeupCache: make(map[string]api.Tradeup),
     }
 
     s.UseMiddleware()
@@ -97,6 +101,9 @@ func (s *Server) handleSubscription(userID string, msg []byte) {
 			s.logger.Error("couldn't get tradeups", "error", err)
 			return
 		}
+
+		s.lastFetchTime = time.Now()
+
         client.Conn.WriteJSON(fiber.Map{"event": "sync_state", "tradeups": tradeups})
     case "subscribe_one":
         client.SubscribedAll = false
@@ -106,6 +113,9 @@ func (s *Server) handleSubscription(userID string, msg []byte) {
 			s.logger.Error("couldn't get tradeup", "tradeupID", payload.TradeupID, "error", err)
 			return
 		}
+
+		s.tradeupCache[payload.TradeupID] = t
+
 		client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
     case "unsubscribe":
         client.SubscribedAll = false
@@ -132,7 +142,16 @@ func (s *Server) broadcastState() {
 				log.Println(err)
 				return 
 			}
-			client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
+
+			cachedTradeup, exists := s.tradeupCache[client.SubscribedID]
+
+			if !exists || !TradeupEqual(t, cachedTradeup) {
+				s.tradeupCache[client.SubscribedID] = t
+				s.lastFetchTime = time.Now()
+
+				s.logger.Info("sending updated tradeup")
+				client.Conn.WriteJSON(fiber.Map{"event": "sync_tradeup", "tradeup": t})
+			}
         }
     }
 }

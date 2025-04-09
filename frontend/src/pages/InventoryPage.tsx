@@ -26,7 +26,7 @@ export default function InventoryPage() {
     sorted.sort((a, b) => {
       switch (filter) {
         case "Rarity":
-          return rarityOrder.indexOf(a.data.rarity) - rarityOrder.indexOf(b.data.rarity)
+          return rarityOrder.indexOf(b.data.rarity) - rarityOrder.indexOf(a.data.rarity)
         case "Wear":
           return a.data.float - b.data.float
         case "Price":
@@ -77,13 +77,13 @@ export default function InventoryPage() {
       <div className="card flex flex-col items-center text-center gap-3 bg-base-200 p-4 h-fit w-full lg:w-[14vw]">
         <h1 className="font-bold text-lg">Settings</h1>
         <form className="filter" onClick={handleFilter}>
-          <input className="btn btn-soft btn-square" type="reset" value="×"/>
-          <input className="btn btn-soft btn-info" type="radio" name="frameworks" aria-label="Rarity"/>
-          <input className="btn btn-soft btn-accent" type="radio" name="frameworks" aria-label="Wear"/>
-          <input className="btn btn-soft btn-warning" type="radio" name="frameworks" aria-label="Price"/>
+          <input className="btn btn-square" type="reset" value="×"/>
+          <input className="btn btn-info" type="radio" name="frameworks" aria-label="Rarity"/>
+          <input className="btn btn-accent" type="radio" name="frameworks" aria-label="Wear"/>
+          <input className="btn btn-warning" type="radio" name="frameworks" aria-label="Price"/>
         </form>
         <div className="w-full">
-          <button className="btn btn-soft btn-error w-full">Enter delete mode</button>
+          <button className="btn btn-error w-full">Enter delete mode</button>
         </div>
       </div>
 
@@ -103,7 +103,7 @@ export default function InventoryPage() {
 function InventoryItem({ skin }: { skin: Skin }) {
   return (
     <div
-      className={`card card-xs w-54 bg-base-300 shadow-sm cursor-pointer hover:shadow-xl hover:shadow-pink-100`}
+      className={`card card-xs w-54 bg-base-300 shadow-sm cursor-pointer hover:shadow-xl hover:shadow-accent`}
     >
       {skin.price !== 0 ? (
         <h1 className="font-bold text-accent ml-1.5">${skin.price.toFixed(2)}</h1>

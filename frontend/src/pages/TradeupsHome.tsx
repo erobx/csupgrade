@@ -19,7 +19,7 @@ function TradeupsHome() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2 mt-3">
+    <div className="flex flex-col h-screen items-center gap-2 mt-3">
       <h1 className="text-warning font-bold text-3xl">Active Tradeups</h1>
       {/* Status Filter Dropwdown */}
       <div className="filter mb-4 flex gap-1">
@@ -46,6 +46,7 @@ function TradeupsHome() {
       {displayTradeups.length > 0 ? (
         displayTradeups.map((t: Tradeup) =>
           <TradeupRow
+            key={t.id}
             id={t.id}
             players={t.players}
             rarity={t.rarity}
@@ -58,6 +59,7 @@ function TradeupsHome() {
           <h1 className="font-bold text-info">No tradeups available.</h1>
         </div>
       )}
+      <div className="flex flex-grow"></div>
       <Footer />
     </div>
   )

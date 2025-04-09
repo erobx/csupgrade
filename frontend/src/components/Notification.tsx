@@ -17,9 +17,15 @@ export default function Notification() {
   return (
     <div className="toast toast-end z-40">
       {notifications.map((notification, index) => (
-        <div key={index} className="alert alert-info">
-          <span>{notification}</span>
-        </div>
+        notification !== "Insufficient funds" ? (
+          <div key={index} className="alert alert-info">
+            <span>{notification}</span>
+          </div>
+        ) : (
+          <div key={index} className="alert alert-error">
+            <span>{notification}</span>
+          </div> 
+        )
       ))}
     </div>
   )

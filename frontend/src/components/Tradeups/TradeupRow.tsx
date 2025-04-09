@@ -68,7 +68,7 @@ function InfoPanel({ rarity, count }: { rarity: string, count: number }) {
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <div className="card-title font-bold text-warning text-xl">
+          <div className="card-title font-bold text-primary text-xl">
             {count}
           </div>
         </div>

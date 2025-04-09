@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useInventory } from "../../providers/InventoryProvider";
 import { InventoryItem } from "../../types/inventory";
 import { Skin } from "../../types/skin";
@@ -27,6 +26,7 @@ export default function TradeupGrid({ tradeupId, rarity, items, status}: Tradeup
     <div className="grid lg:grid-cols-5 grid-rows-2 md:grid-cols-2 rounded mt-5 gap-2">
       {skins.map((skin, index) => (
         <GridItem 
+          key={invIds[index]}
           invId={invIds[index]}
           tradeupId={tradeupId}
           name={skin.name}

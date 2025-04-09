@@ -8,12 +8,12 @@ export const rarities = [
 ]
 
 export const rarityOrder = [
-    "Covert",
-    "Classified",
-    "Restricted",
-    "Mil-Spec",
+    "Consumer",
     "Industrial",
-    "Consumer"
+    "Mil-Spec",
+    "Restricted",
+    "Classified",
+    "Covert"
 ]
 
 export const badgeMap = {

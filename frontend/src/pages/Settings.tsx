@@ -7,15 +7,15 @@ export default function Settings() {
     window.location.reload()
   }
 
-  const themes = ["dim", "light", "retro", "sunset"]
+  const themes = ["dim", "winter", "night", "dracula"]
 
   useEffect(() => {
     themeChange(false)
   }, [])
 
   return (
-    <div className="flex justify-center mt-4">
-      <div className="card card-md p-6 bg-base-300">
+    <div className="">
+      <div className="card card-md p-6 bg-base-300 h-fit">
         <div className="card-title">
           <h1>Settings</h1>
         </div>

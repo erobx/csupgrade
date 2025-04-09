@@ -24,7 +24,7 @@ function TradeupDetails() {
   return (
     <div>
       <div className="fixed ml-6">
-        <button className="btn btn-accent" onClick={() => navigate("/tradeups")}>Back to Tradeups</button>
+        <button className="btn btn-secondary" onClick={() => navigate("/tradeups")}>Back to Tradeups</button>
       </div>
       {currentTradeup && sortedItems ? (
         <div className="flex flex-col items-center gap-2 mt-5">
