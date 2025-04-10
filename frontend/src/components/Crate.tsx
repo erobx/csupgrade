@@ -7,6 +7,7 @@ type CrateProps = {
   crateId: string;
   name: string;
   amount: number;
+  cost: number;
 }
 
 type Response = {
@@ -14,7 +15,7 @@ type Response = {
   items: InventoryItem[];
 }
 
-export default function Crate({ crateId, name, amount }: CrateProps) {
+export default function Crate({ crateId, name, amount, cost }: CrateProps) {
   const { user, setBalance } = useAuth()
   const { addItem } = useInventory()
   const { addNotification } = useNotification()
@@ -32,7 +33,7 @@ export default function Crate({ crateId, name, amount }: CrateProps) {
         })
 
         if (res.status === 500) {
-          addNotification("Insufficient funds")
+          addNotification("Insufficient funds", "warning")
           return
         }
 
@@ -41,13 +42,13 @@ export default function Crate({ crateId, name, amount }: CrateProps) {
           data.items.map(item => {
             addItem(item)
           })
-          addNotification("Crate purchased successfully!")
+          addNotification("Crate purchased successfully!", "success")
         }
 
         setBalance(data.balance)
       } catch (error) {
         console.error(error)
-        addNotification("An error occurred while purchasing the crate.")
+        addNotification("An error occurred while purchasing the crate.", "error")
       }
     }
   }
@@ -57,6 +58,9 @@ export default function Crate({ crateId, name, amount }: CrateProps) {
       <div className="card-body">
         <h2 className="card-title">
           {name}
+        </h2>
+        <h2 className="card-title">
+          ${cost.toFixed(2)}
         </h2>
         <figure>
           <img src="crate.png" alt="" />

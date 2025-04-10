@@ -14,7 +14,7 @@ export default function Settings() {
   }, [])
 
   return (
-    <div className="">
+    <div className="m-auto mt-5">
       <div className="card card-md p-6 bg-base-300 h-fit">
         <div className="card-title">
           <h1>Settings</h1>

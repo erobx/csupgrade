@@ -40,7 +40,7 @@ export function useWebSocket(userId: string) {
           if (data.userId === userId) {
             addItem({ ...data.winningItem, visible: true })
             setWinningItem(data.winningItem)
-            addNotification(`New item won ${data.winningItem.data.name}`)
+            addNotification(`New item won ${data.winningItem.data.name}`, "info")
           }
         } else if (data.event === "new_item") {
           addItem({ ...data.item, visible: true })

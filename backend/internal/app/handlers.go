@@ -189,6 +189,10 @@ func (s *Server) addSkinToTradeup() fiber.Handler {
 
 		err := s.tradeupService.AddSkinToTradeup(tradeupID, invID, userID)
 		if err != nil {
+			if err == api.ErrMaxContribution {
+				return c.SendStatus(fiber.StatusBadRequest)
+			}
+
 			log.Println(err)
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}

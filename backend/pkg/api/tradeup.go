@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"time"
+	
 )
 
 type TradeupService interface {
@@ -24,6 +25,7 @@ type TradeupRepository interface {
 
 	CheckSkinOwnership(invID, userID string) (bool, error)
 	IsTradeupFull(tradeupID string) (bool, error)
+	GetUserContribution(tradeupID, userID string) (int, error)
 	StartTimer(tradeupID string) error
 	StopTimer(tradeupID string) error
 	GetStatus(tradeupID string) (string, error)
@@ -34,7 +36,6 @@ type TradeupRepository interface {
 
 type tradeupService struct {
 	storage 	TradeupRepository
-	skinsAdded	map[string]map[string]int // user => tradeupID => amount
 	winnings 	chan Winnings
 	logger		LogService
 }
@@ -42,7 +43,6 @@ type tradeupService struct {
 func NewTradeupService(tr TradeupRepository, w chan Winnings, logger LogService) TradeupService {
 	return &tradeupService{
 		storage: tr, 
-		skinsAdded: make(map[string]map[string]int),
 		winnings: w, 
 		logger: logger,
 	}
@@ -73,6 +73,16 @@ func (ts *tradeupService) AddSkinToTradeup(tradeupID, invID, userID string) erro
 
 	if isFull {
 		return errors.New("cannot add skin - tradeup is full")
+	}
+
+	contribution, err := ts.storage.GetUserContribution(tradeupID, userID)
+	if err != nil {
+		return err
+	}
+
+	if contribution > 4 {
+		ts.logger.Info("max skins reached", "contribution", contribution)
+		return ErrMaxContribution
 	}
 	
 	err = ts.storage.AddSkinToTradeup(tradeupID, invID)

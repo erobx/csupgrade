@@ -9,7 +9,7 @@ function TradeupsHome() {
   const { tradeups } = useWS()
   const [selectedRarity, setSelectedRarity] = useState("All")
 
-  const sorted = tradeups.sort((a, b) => parseInt(a.id) - parseInt(b.id))
+  const sorted = tradeups.sort((a, b) => b.items.length - a.items.length)
   const displayTradeups = selectedRarity === "All"
       ? sorted
       : sorted.filter(t => t.rarity === selectedRarity)

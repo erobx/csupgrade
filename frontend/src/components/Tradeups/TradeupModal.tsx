@@ -4,6 +4,7 @@ import { Skin } from "../../types/skin"
 import StatTrakBadge from "../StatTrakBadge"
 import useAuth from "../../stores/authStore"
 import { useNavigate } from "react-router"
+import { useNotification } from "../../stores/notificationStore"
 
 export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string, rarity: string }) {
   const { loggedIn } = useAuth()
@@ -19,16 +20,20 @@ export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string,
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
 
-  const filtered = useMemo(() => {
+  const sorted = useMemo(() => {
     if (!inventory) return
-    const temp = inventory.items.filter(i => i.data.rarity === rarity)
-    const pages = Math.ceil(temp.length / itemsPerPage)
+    const filtered = inventory.items.filter(i => i.data.rarity === rarity && i.visible === true)
+    const pages = Math.ceil(filtered.length / itemsPerPage)
     setTotalPages(pages)
 
-    return inventory.items.filter(i => i.data.rarity === rarity && i.visible === true)
+    return filtered.sort((a, b) => {
+      const n1: string = a.data.name
+      const n2: string = b.data.name
+      return n1.localeCompare(n2)
+    })
   }, [inventory])
 
-  const currentItems = filtered?.slice(startIndex, endIndex)
+  const currentItems = sorted?.slice(startIndex, endIndex)
 
   const onClick = () => {
     if (loggedIn) {
@@ -42,9 +47,9 @@ export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string,
     <div className="h-48">
       <button className="btn btn-info" onClick={onClick}>Add Skin</button>
       <dialog id="modal_add" className="modal">
-        <div className="modal-box max-w-7xl max-h-3xl">
+        <div className="modal-box max-w-7xl max-h-3xl md:w-fit">
           <h3 className="font-bold text-lg mb-1">Showing all available skins...</h3>
-          <div className="grid grid-cols-5 grid-rows-3 gap-2">
+          <div className="grid grid-cols-5 grid-flow-rows md:grid-cols-3 gap-2">
           {currentItems ? (
             currentItems.map(item => (
               <ModalItem
@@ -84,6 +89,7 @@ type ModalItemProps = {
 
 function ModalItem({ invId, tradeupId, skin, setItemVisibility }: ModalItemProps) {
   const { user } = useAuth()
+  const { addNotification } = useNotification()
 
   const addSkin = async () => {
     console.log(`adding skin ${invId} to tradeup ${tradeupId}...`)
@@ -96,9 +102,18 @@ function ModalItem({ invId, tradeupId, skin, setItemVisibility }: ModalItemProps
           Authorization: `Bearer ${jwt}`,
         },
       })
-      if (res.status !== 200) {
+
+      if (res.status === 400) {
+        addNotification("Reached max amount of skins contributed", "error")
         return
       }
+
+      if (res.status !== 200) {
+        addNotification("Could not add skin", "error")
+        return
+      }
+
+      addNotification("Successfully added skin", "success")
       setItemVisibility(invId, false)
     } catch (error) {
       console.error("Error: ", error)

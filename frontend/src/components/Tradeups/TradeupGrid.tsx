@@ -1,4 +1,5 @@
 import { useInventory } from "../../providers/InventoryProvider";
+import { useNotification } from "../../stores/notificationStore";
 import { InventoryItem } from "../../types/inventory";
 import { Skin } from "../../types/skin";
 import StatTrakBadge from "../StatTrakBadge";
@@ -23,7 +24,7 @@ export default function TradeupGrid({ tradeupId, rarity, items, status}: Tradeup
   const owernship: boolean[] = items.map(item => ownsItem(item.invId))
 
   return (
-    <div className="grid lg:grid-cols-5 grid-rows-2 md:grid-cols-2 rounded mt-5 gap-2">
+    <div className="grid lg:grid-cols-5 grid-flow-row md:grid-cols-4 rounded mt-5 gap-2">
       {skins.map((skin, index) => (
         <GridItem 
           key={invIds[index]}
@@ -110,6 +111,8 @@ type ModalProps = {
 }
 
 function Modal({ invId, tradeupId, setItemVisibility }: ModalProps) {
+  const { addNotification } = useNotification()
+
   const onClick = async () => {
     const jwt = localStorage.getItem("jwt")
     try {
@@ -121,9 +124,11 @@ function Modal({ invId, tradeupId, setItemVisibility }: ModalProps) {
       })
       
       if (res.status !== 200) {
+        addNotification("Could not remove skin", "error")
         return
       }
       
+      addNotification("Successfully removed skin", "success")
       setItemVisibility(invId, true)
     } catch(error) {
       console.error("Error removing skin from tradeup:", error)

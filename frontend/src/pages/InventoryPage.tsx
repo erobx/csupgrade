@@ -2,7 +2,6 @@ import { useState } from "react"
 import RarityBadge from "../components/RarityBadge"
 import StatTrakBadge from "../components/StatTrakBadge"
 import PageSelector from "../components/PageSelector"
-import { outlineMap } from "../constants/constants"
 import { useInventory } from "../providers/InventoryProvider"
 import { Skin } from "../types/skin"
 import { rarityOrder } from "../constants/constants"
@@ -31,8 +30,14 @@ export default function InventoryPage() {
           return a.data.float - b.data.float
         case "Price":
           return b.data.price - a.data.price
+        case "A-Z":
+          const n1: string = a.data.name
+          const n2: string = b.data.name
+          return n1.localeCompare(n2)
         default:
-          return b.data.createdAt - a.data.createdAt
+          const aDate = new Date(a.data.createdAt)
+          const bDate = new Date(b.data.createdAt)
+          return bDate.getTime() - aDate.getTime()
       }
     })
     return sorted
@@ -50,7 +55,7 @@ export default function InventoryPage() {
   if (!inventory) return <div className="loading-spinner loading-md"></div>
 
   return (
-    <div className="flex lg:flex-row gap-6 md:flex-col md:w-fit md:m-auto md:mt-5">
+    <div className="flex lg:flex-row gap-6 items-center md:flex-col lg:items-start md:w-fit md:m-auto md:mt-5">
       <div className="grid grid-cols-3 lg:grid-cols-6 gap-2">
         {inventory.items.length === 0 ? (
           <h1 className="text-xl font-bold text-info">Visit the Store for more skins!</h1>
@@ -74,20 +79,21 @@ export default function InventoryPage() {
         )}
       </div>
 
-      <div className="card flex flex-col items-center text-center gap-3 bg-base-200 p-4 h-fit w-full lg:w-[14vw]">
-        <h1 className="font-bold text-lg">Settings</h1>
+      <div className="card flex flex-col items-center text-center gap-3 bg-base-300 p-4 h-fit w-full lg:w-fit md:mb-4">
+        <h1 className="font-bold text-lg">Filters</h1>
         <form className="filter" onClick={handleFilter}>
           <input className="btn btn-square" type="reset" value="×"/>
-          <input className="btn btn-info" type="radio" name="frameworks" aria-label="Rarity"/>
-          <input className="btn btn-accent" type="radio" name="frameworks" aria-label="Wear"/>
-          <input className="btn btn-warning" type="radio" name="frameworks" aria-label="Price"/>
+          <input className="btn btn-neutral" type="radio" name="frameworks" aria-label="Rarity"/>
+          <input className="btn btn-neutral" type="radio" name="frameworks" aria-label="Wear"/>
+          <input className="btn btn-neutral" type="radio" name="frameworks" aria-label="Price"/>
+          <input className="btn btn-neutral" type="radio" name="frameworks" aria-label="A-Z"/>
         </form>
         <div className="w-full">
           <button className="btn btn-error w-full">Enter delete mode</button>
         </div>
       </div>
 
-      <div className="fixed bottom-4 right-8 z-50">
+      <div className="fixed bottom-4 right-8 z-30">
         <div className="join">
           <button className="join-item btn" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>«</button>
           <div className="join-item btn"> 

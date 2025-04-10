@@ -30,6 +30,7 @@ type Storage interface {
 	AddSkinToTradeup(tradeupID, invID string) error
 	RemoveSkinFromTradeup(tradeupID, invID string) error
 	MaintainTradeupCount() error
+	GetUserContribution(tradeupID, userID string) (int, error)
 
 	// Helpers
 	CheckSkinOwnership(invID, userID string) (bool, error)

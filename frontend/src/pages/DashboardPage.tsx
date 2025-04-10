@@ -29,7 +29,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="flex lg:flex-row sm:flex-col mt-5">
+    <div className="flex lg:flex-row sm:flex-col mt-5 m-auto">
       <RecentTradeups user={user} />
       <div className="divider lg:divider-horizontal"></div>
       <Stats user={user} />

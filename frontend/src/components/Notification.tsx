@@ -7,7 +7,7 @@ export default function Notification() {
   useEffect(() => {
     if (notifications.length > 0) {
       const timer = setTimeout(() => {
-        removeNotification(notifications[0])
+        removeNotification(notifications[0].message)
       }, 3000)
 
       return () => clearTimeout(timer)
@@ -17,15 +17,9 @@ export default function Notification() {
   return (
     <div className="toast toast-end z-40">
       {notifications.map((notification, index) => (
-        notification !== "Insufficient funds" ? (
-          <div key={index} className="alert alert-info">
-            <span>{notification}</span>
-          </div>
-        ) : (
-          <div key={index} className="alert alert-error">
-            <span>{notification}</span>
-          </div> 
-        )
+        <div key={index} className={`alert alert-${notification.type}`}>
+          <span>{notification.message}</span>
+        </div>
       ))}
     </div>
   )

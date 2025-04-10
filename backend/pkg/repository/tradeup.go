@@ -190,9 +190,27 @@ func (s *storage) RemoveSkinFromTradeup(tradeupID, invID string) error {
 	return nil
 }
 
+func (s *storage) GetUserContribution(tradeupID, userID string) (int, error) {
+	var contrib int
+
+	q := `
+	select count(ts.inv_id) as skin_count
+	from tradeups_skins ts
+	join inventory i on ts.inv_id = i.id
+	where ts.tradeup_id = $1
+	  and i.user_id = $2
+	`
+	err := s.db.QueryRow(context.Background(), q, tradeupID, userID).Scan(&contrib)
+	if err != nil {
+		return 0, err
+	}
+
+	return contrib, nil
+}
+
 func (s *storage) StartTimer(tradeupID string) error {
 	// UTC timestamp is off by 4 hours currently for me
-	q := "update tradeups set stop_time=now()+interval '5 min',current_status='Waiting' where id=$1"
+	q := "update tradeups set stop_time=now()+interval '1 min',current_status='Waiting' where id=$1"
 	_, err := s.db.Exec(context.Background(), q, tradeupID)
 	return err
 }
@@ -402,7 +420,7 @@ func (s *storage) MaintainTradeupCount() error {
 			return err
         }
         
-        if count < 3 {
+        if count < 5 {
 			q := "insert into tradeups(rarity) values($1)"
 			_, err := tx.Exec(context.Background(), q, r)
 			if err != nil {
