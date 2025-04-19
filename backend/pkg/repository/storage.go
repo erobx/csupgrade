@@ -20,6 +20,7 @@ type Storage interface {
 	GetUserAndHashByEmail(email string) (api.User, string, error)
 	GetInventory(userID string) (api.Inventory, error)
 	GetRecentTradeups(userID string) ([]api.RecentTradeup, error)
+	GetRecentWinnings(userID string) ([]api.Item, error)
 
 	// Store
 	BuyCrate(crateID, userID string, amount int) (float64, []api.Item, error)

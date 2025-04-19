@@ -21,6 +21,14 @@ function TradeupDetails() {
     return currentTradeup.items.sort((a, b) => parseInt(a.invId) - parseInt(b.invId))
   }, [currentTradeup])
 
+  if (!currentTradeup) {
+    return (
+      <div className="flex justify-center mt-52">
+        <div className="loading loading-spinner loading-xl"></div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="fixed ml-6">

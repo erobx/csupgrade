@@ -63,6 +63,7 @@ type GridItemProps = {
 
 function GridItem({ invId, tradeupId, name, wear, price, isStatTrak, imgSrc, owned, status, setItemVisibility }: GridItemProps) {
   const shadowColor = owned ? "shadow-accent" : "shadow-error"
+  const cursor = owned ? "cursor-pointer" : "";
 
   const onSelect = () => {
     if (owned && status !== "Completed") {
@@ -72,7 +73,7 @@ function GridItem({ invId, tradeupId, name, wear, price, isStatTrak, imgSrc, own
 
   return (
     <div
-      className={`card card-xs w-48 bg-base-200 shadow-md m-0.5 hover:shadow-lg hover:${shadowColor} hover:cursor-pointer`}
+      className={`card card-xs w-48 bg-base-200 shadow-md m-0.5 hover:shadow-lg hover:${shadowColor} hover:${cursor}`}
       onClick={onSelect}
     >
       {owned ? (

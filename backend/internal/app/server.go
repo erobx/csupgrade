@@ -72,7 +72,6 @@ func (s *Server) Run() {
 }
 
 func (s *Server) handleSubscription(userID string, msg []byte) {
-    log.Println(string(msg))
     var payload struct {
         Event       string `json:"event"`
         UserID      string `json:"userID,omitempty"`
@@ -83,6 +82,8 @@ func (s *Server) handleSubscription(userID string, msg []byte) {
         log.Println("Invalid JSON:", err)
         return
     }
+
+	s.logger.Info("incoming", "payload", payload)
 
     s.Lock()
     defer s.Unlock()

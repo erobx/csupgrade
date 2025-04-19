@@ -172,3 +172,11 @@ func (s *storage) GetRecentTradeups(userID string) ([]api.RecentTradeup, error) 
 
 	return recentTradeups, nil
 }
+
+func (s *storage) GetRecentWinnings(userID string) ([]api.Item, error) {
+	var winnings []api.Item
+
+
+
+	return winnings, nil
+}

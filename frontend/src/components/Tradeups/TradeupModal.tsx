@@ -49,7 +49,7 @@ export default function TradeupModal({ tradeupId, rarity }: { tradeupId: string,
       <dialog id="modal_add" className="modal">
         <div className="modal-box max-w-7xl max-h-3xl md:w-fit">
           <h3 className="font-bold text-lg mb-1">Showing all available skins...</h3>
-          <div className="grid grid-cols-5 grid-flow-rows md:grid-cols-3 gap-2">
+          <div className="grid lg:grid-cols-5 grid-flow-rows md:grid-cols-3 gap-2">
           {currentItems ? (
             currentItems.map(item => (
               <ModalItem
