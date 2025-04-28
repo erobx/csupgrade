@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/erobx/tradeups-backend/pkg/api"
+	"github.com/erobx/csupgrade/backend/pkg/api"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"

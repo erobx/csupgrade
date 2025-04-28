@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"math/rand/v2"
 
-	"github.com/erobx/tradeups-backend/pkg/api"
+	"github.com/erobx/csupgrade/backend/pkg/api"
 	"github.com/jackc/pgx/v5"
 )
 

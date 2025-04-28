@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/erobx/tradeups-backend/pkg/api"
+	"github.com/erobx/csupgrade/backend/pkg/api"
 	"github.com/gofiber/fiber/v2"
 )
 

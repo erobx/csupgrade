@@ -1,4 +1,4 @@
-module github.com/erobx/tradeups-backend
+module github.com/erobx/csupgrade/backend
 
 go 1.24.0
 

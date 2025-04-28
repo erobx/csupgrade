@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/erobx/tradeups-backend/pkg/db"
+	"github.com/erobx/csupgrade/backend/pkg/db"
 	"github.com/joho/godotenv"
 )
 

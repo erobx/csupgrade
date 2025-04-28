@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/erobx/tradeups-backend/pkg/api"
+	"github.com/erobx/csupgrade/backend/pkg/api"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
