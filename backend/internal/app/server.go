@@ -97,6 +97,7 @@ func (s *Server) handleSubscription(userID string, msg []byte) {
         client.SubscribedAll = true
         client.SubscribedID = ""
 		tradeups, err := s.tradeupService.GetAllTradeups()
+        // hello world!
 		if err != nil {
 			s.logger.Error("couldn't get tradeups", "error", err)
 			return

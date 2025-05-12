@@ -1,7 +1,7 @@
 import { useWS } from "../providers/WebSocketProvider"
 import TradeupGrid from "../components/Tradeups/TradeupGrid"
 import CountdownTimer from "../components/CountdownTimer"
-import { useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate, useParams } from "react-router"
 
 function TradeupDetails() {
@@ -9,10 +9,15 @@ function TradeupDetails() {
   const navigate = useNavigate()
   const tradeupId = params.tradeupId
   const { currentTradeup, clearCurrentTradeup, subscribeToTradeup } = useWS()
+  const [loading, setLoading] = useState(true)
   const textColor: string = ""
 
   useEffect(() => {
-    if (tradeupId) subscribeToTradeup(tradeupId)
+    if (tradeupId) {
+      setLoading(true)
+      subscribeToTradeup(tradeupId)
+      setLoading(false)
+    }
     return () => clearCurrentTradeup()
   }, [tradeupId])
 
@@ -20,6 +25,14 @@ function TradeupDetails() {
     if (!currentTradeup) return
     return currentTradeup.items.sort((a, b) => parseInt(a.invId) - parseInt(b.invId))
   }, [currentTradeup])
+
+  if (loading) {
+    return (
+      <div className="flex justify-center">
+        <div className="loading-dots"></div>
+      </div>
+    )
+  }
 
   return (
     <div>

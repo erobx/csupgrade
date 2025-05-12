@@ -118,7 +118,7 @@ func (s *Server) getInventory() fiber.Handler {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
-        log.Printf("Requesting inventory for %s\n", userID)
+        s.logger.Info("requesting inventory", "user", userID)
 
         inventory, err := s.userService.GetInventory(userID)
 		if err != nil {
@@ -243,12 +243,13 @@ func (s *Server) handleWebSocket(c *websocket.Conn) {
         delete(s.clients, userID)
         s.Unlock()
         c.Close()
+        s.logger.Info("websocket closed", "user", userID)
     }()
 
     for {
         _, msg, err := c.ReadMessage()
         if err != nil {
-            log.Println("WebSocket closed for", userID, ":", err)
+            s.logger.Error("WebSocket closed", "user", userID)
             break
         }
 

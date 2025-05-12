@@ -55,8 +55,8 @@ function TradeupsHome() {
           />
         )
       ) : (
-        <div className="card p-8 bg-base-300">
-          <h1 className="font-bold text-info">No tradeups available.</h1>
+        <div>
+          <h1 className="loading loading-spinner loading-lg"></h1>
         </div>
       )}
       <div className="flex flex-grow"></div>

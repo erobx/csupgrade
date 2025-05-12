@@ -9,6 +9,11 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    host: true,
+    port: 5173,
+    hmr: {
+        clientPort: 5173,
+    },
     proxy: {
       '/v1': {
         target: 'http://localhost:8080',
